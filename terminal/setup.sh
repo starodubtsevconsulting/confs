@@ -10,6 +10,28 @@ fi
 sudo apt update
 sudo apt install -y zsh zsh-autosuggestions zsh-syntax-highlighting fzf bat eza
 
+# Ensure "bat" command exists on Ubuntu (package provides batcat)
+if command -v batcat >/dev/null 2>&1 && ! command -v bat >/dev/null 2>&1; then
+  mkdir -p "$HOME/.local/bin"
+  ln -sfn "$(command -v batcat)" "$HOME/.local/bin/bat"
+  if ! grep -q "# LOCAL_BIN_START" "$HOME/.profile" 2>/dev/null; then
+    {
+      echo ""
+      echo "# LOCAL_BIN_START"
+      echo "export PATH=\"\$HOME/.local/bin:\$PATH\""
+      echo "# LOCAL_BIN_END"
+    } >> "$HOME/.profile"
+  fi
+  if ! grep -q "# LOCAL_BIN_START" "$HOME/.zshrc" 2>/dev/null; then
+    {
+      echo ""
+      echo "# LOCAL_BIN_START"
+      echo "export PATH=\"\$HOME/.local/bin:\$PATH\""
+      echo "# LOCAL_BIN_END"
+    } >> "$HOME/.zshrc"
+  fi
+fi
+
 # Set zsh as default shell for this user
 chsh -s "$(command -v zsh)"
 

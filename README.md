@@ -36,3 +36,6 @@ for your AI companion to be helpful.
 
 Note: the scripts are written for zsh/bash and should work on macOS too, but
 I have not tested that.
+
+Setup scripts may update `~/.profile` and `~/.zshrc` to adjust PATH defaults.
+Where a `switch.sh` exists, it only repoints the `current` symlink.

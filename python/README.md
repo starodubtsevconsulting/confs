@@ -14,3 +14,4 @@ Run:
 ```
 
 The script adds `~/python/current/bin` to your PATH in `~/.profile`.
+Note: setup may update `~/.profile` and `~/.zshrc` for PATH defaults.

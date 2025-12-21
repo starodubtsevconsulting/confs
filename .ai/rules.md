@@ -14,6 +14,8 @@ Repo structure:
 - Each folder owns its setup, README, and optional helpers.
 - Home-local installs are preferred when system installs are restricted.
 - When adding new tooling, update `check.sh` to report it.
+- For language runtimes, use `v_matrix.json` to pick recommended versions and
+  install multiple majors when configured; provide a local `switch.sh`.
 
 AI workflow expectations:
 - Be explicit about what will change before running it.

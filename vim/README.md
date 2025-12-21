@@ -16,6 +16,8 @@ Run:
 ./setup.sh
 ```
 
+Note: setup may update `~/.profile` and `~/.zshrc` for PATH defaults.
+
 After install, open Vim and run `:PlugInstall` if plugins were not installed
 automatically.
 

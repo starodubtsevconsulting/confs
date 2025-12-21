@@ -17,3 +17,5 @@ Run:
 After install, log out/in (or run `newgrp docker`) to use Docker without sudo.
 If you previously had the Ubuntu `docker.io` package installed, this setup
 will remove it to avoid conflicts.
+
+Note: setup may update `~/.profile` and `~/.zshrc` for PATH defaults.
