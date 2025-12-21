@@ -18,4 +18,7 @@ Run the root setup script:
 ```bash
 ./setup.sh
 ```
+Some setup scripts may overlap and try to install already installed packages.
+That is OK and intentional.
+
 After running, open a new terminal (or run `exec zsh`) to activate the changes.
