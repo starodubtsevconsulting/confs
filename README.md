@@ -18,6 +18,8 @@ README with details for that area.
 
 ## Usage
 
+Before doing anything, run `./check.sh` to see what is already installed.
+
 Run the root setup script:
 
 ```bash
