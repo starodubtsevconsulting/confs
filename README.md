@@ -21,4 +21,10 @@ Run the setup script you want, for example:
 ./git/setup.sh
 ```
 
+After installing GitHub CLI, authenticate once:
+
+```bash
+gh auth login
+```
+
 After running, open a new terminal (or run `exec zsh`) to activate the changes.
