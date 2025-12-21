@@ -6,6 +6,11 @@ Common actions for this repo:
 # Check what is installed
 ./check.sh
 
+# Switch language versions
+python-switch
+java-switch
+node-switch
+
 # Run all setups from the root
 ./setup.sh
 
@@ -16,6 +21,7 @@ Common actions for this repo:
 ./docker/setup.sh
 ./python/setup.sh
 ./java/setup.sh
+./nodejs/setup.sh
 ```
 
 Notes:
