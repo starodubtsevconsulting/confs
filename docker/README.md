@@ -1,6 +1,7 @@
 # Docker setup
 
-Installs Docker Engine and the Compose plugin on Ubuntu.
+Installs Docker Engine and the Compose plugin on Ubuntu using the official
+Docker repo.
 
 What it gives you:
 - docker engine (daemon + CLI)
@@ -14,3 +15,5 @@ Run:
 ```
 
 After install, log out/in (or run `newgrp docker`) to use Docker without sudo.
+If you previously had the Ubuntu `docker.io` package installed, this setup
+will remove it to avoid conflicts.
