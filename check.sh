@@ -215,3 +215,31 @@ if [ -d "${java_home}/latest-aws" ]; then
 else
   print_item "java latest dir" "MISSING"
 fi
+
+echo
+echo "Node.js"
+node_home="$HOME/node"
+node_current="${node_home}/current/bin/node"
+
+if [ -x "$node_current" ]; then
+  node_version="$("$node_current" -v 2>/dev/null | sed -E 's/^v//')"
+  print_item "node" "OK" "${node_version:-unknown}"
+else
+  if has_cmd node; then
+    print_item "node" "SYSTEM"
+  else
+    print_item "node" "MISSING"
+  fi
+fi
+
+if [ -d "${node_home}/22" ]; then
+  print_item "node 22 dir" "OK"
+else
+  print_item "node 22 dir" "MISSING"
+fi
+
+if [ -x "${node_home}/switch.sh" ]; then
+  print_item "node switch.sh" "OK"
+else
+  print_item "node switch.sh" "MISSING"
+fi
