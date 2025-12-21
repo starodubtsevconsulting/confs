@@ -54,5 +54,5 @@ Where a `switch.sh` exists, it only repoints the `current` symlink.
 ## Wrapping up
 
 Feel free to contribute or fork; this repo is free to use.
-If you have any other questions, visit my site: https://starodubstev.consulting
+If you have any other questions, visit my site: https://starodubtsev.consulting/
 Blog: https://locusesse.com/
