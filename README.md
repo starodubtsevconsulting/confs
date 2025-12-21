@@ -6,6 +6,11 @@ This repo is meant to make fresh Ubuntu setups fast and repeatable. It includes
 scripts for terminal setup (zsh, completions, prompt) and Git tooling, and will
 grow to cover other tools and system configs over time.
 
+This is for desktop machines, not servers. I keep it simple and prefer
+predictable home-folder installs (e.g. `~/node/25`, `~/java/21-aws`) so scripts
+always know where to look. It might not match how others do it, but it works
+for me. I may add a server-focused repo later.
+
 ## Structure
 
 This repo is organized into folders. Each folder has a `setup.sh` and a
