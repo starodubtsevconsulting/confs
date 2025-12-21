@@ -30,3 +30,6 @@ if getent group docker >/dev/null 2>&1; then
 fi
 
 echo "Docker installed. Log out/in or run: newgrp docker"
+echo
+echo "=== README ==="
+cat "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/README.md"

@@ -46,3 +46,7 @@ for script in "${scripts[@]}"; do
   fi
 
 done
+
+echo
+echo "=== README ==="
+cat "$root_dir/README.md"

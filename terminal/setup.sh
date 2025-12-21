@@ -101,3 +101,6 @@ if ! grep -q "AUTO_ZSH_START" "$HOME/.profile" 2>/dev/null; then
 fi
 
 echo "Done. Open a new terminal or run: exec zsh"
+echo
+echo "=== README ==="
+cat "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/README.md"

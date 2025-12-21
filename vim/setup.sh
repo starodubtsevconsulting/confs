@@ -48,3 +48,6 @@ if command -v vim >/dev/null 2>&1; then
 fi
 
 echo "Vim setup complete"
+echo
+echo "=== README ==="
+cat "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/README.md"
