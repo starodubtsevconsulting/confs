@@ -24,5 +24,7 @@ automatically.
 Handy command: `:Ex` opens the file explorer so you can navigate files without
 leaving the keyboard.
 
+More tips: https://vim.rtorr.com/
+
 Respect: https://github.com/derekwyatt/vim-config and
 https://vimeo.com/6999927 (best ever).
