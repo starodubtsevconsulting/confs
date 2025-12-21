@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if ! "$script_dir/../scripts/confirm-reinstall.sh" "Docker" "command -v docker"; then
+  exit 0
+fi
+
 # Install Docker Engine from the official Docker repo
 sudo apt update
 sudo apt install -y ca-certificates curl gnupg

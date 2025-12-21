@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if ! "$script_dir/../scripts/confirm-reinstall.sh" "Terminal (zsh)" "command -v zsh"; then
+  exit 0
+fi
+
 # Install packages
 sudo apt update
 sudo apt install -y zsh zsh-autosuggestions zsh-syntax-highlighting fzf bat eza

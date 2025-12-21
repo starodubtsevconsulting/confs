@@ -2,6 +2,11 @@
 set -euo pipefail
 
 JAVA_HOME_BASE="$HOME/java"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if ! "$script_dir/../scripts/confirm-reinstall.sh" "Java" "test -d \"$JAVA_HOME_BASE/21-aws\""; then
+  exit 0
+fi
 
 cleanup() {
   if [ -n "${WORKDIR:-}" ] && [ -d "$WORKDIR" ]; then

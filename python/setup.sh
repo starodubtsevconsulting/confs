@@ -3,6 +3,63 @@ set -euo pipefail
 
 PYTHON_SERIES="3.12"
 PYTHON_HOME="$HOME/python"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if ! "$script_dir/../scripts/confirm-reinstall.sh" "Python" "test -x \"$HOME/python/current/bin/python3\""; then
+  exit 0
+fi
+
+matrix_file="$script_dir/../v_matrix.json"
+if [ -f "$matrix_file" ] && command -v python3 >/dev/null 2>&1; then
+  codename="$(. /etc/os-release && echo "$VERSION_CODENAME")"
+  series_from_matrix="$(python3 - "$matrix_file" "$codename" <<'PY'
+import json
+import sys
+
+path = sys.argv[1]
+codename = sys.argv[2]
+
+with open(path, "r", encoding="utf-8") as fh:
+    data = json.load(fh)
+
+series = data.get("default_python_series")
+for entry in data.get("ubuntu_to_python", []):
+    if entry.get("codename") == codename and entry.get("recommended_python"):
+        series = entry["recommended_python"]
+        break
+
+selected = None
+for entry in data.get("ubuntu_to_python", []):
+    if entry.get("selected"):
+        selected = entry.get("codename")
+        break
+
+if series:
+    print(series)
+if selected:
+    print("SELECTED=" + selected)
+PY
+)"
+  if [ -n "$series_from_matrix" ]; then
+    series_line="$(printf "%s\n" "$series_from_matrix" | head -n1)"
+    selected_line="$(printf "%s\n" "$series_from_matrix" | tail -n1)"
+    if [ -n "$series_line" ]; then
+      PYTHON_SERIES="$series_line"
+    fi
+    if [ "${selected_line#SELECTED=}" != "$selected_line" ]; then
+      selected_codename="${selected_line#SELECTED=}"
+      if [ -n "$selected_codename" ] && [ "$selected_codename" != "$codename" ]; then
+        echo "Matrix check: WARNING - selected OS ($selected_codename) does not match this system ($codename)."
+      else
+        echo "Matrix check: OK - selected OS matches this system ($codename)."
+      fi
+    else
+      echo "Matrix check: WARNING - no selected OS in v_matrix.json."
+    fi
+  fi
+else
+  echo "Matrix check: SKIPPED - v_matrix.json missing or python3 not available."
+fi
 
 cleanup() {
   if [ -n "${WORKDIR:-}" ] && [ -d "$WORKDIR" ]; then
@@ -74,4 +131,4 @@ fi
 echo "Python ${latest_version} installed in ${PYTHON_HOME}/${latest_version}"
 echo
 echo "=== README ==="
-cat "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/README.md"
+cat "$script_dir/README.md"
