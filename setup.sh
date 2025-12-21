@@ -3,6 +3,18 @@ set -euo pipefail
 
 root_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Show current status before any installs
+if [ -x "$root_dir/check.sh" ]; then
+  "$root_dir/check.sh"
+  echo
+  printf "Continue with setup? [Y/NO]: "
+  read -r proceed
+  if [ "${proceed^^}" != "Y" ]; then
+    echo "Aborting."
+    exit 0
+  fi
+fi
+
 # Find all setup.sh scripts under subdirectories (exclude root)
 mapfile -t scripts < <(find "$root_dir" -mindepth 2 -type f -name "setup.sh" | sort)
 

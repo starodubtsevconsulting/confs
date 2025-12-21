@@ -18,6 +18,9 @@ Run the root setup script:
 ```bash
 ./setup.sh
 ```
+Tip: run `./check.sh` first to see what is already installed before deciding
+which folders to run.
+
 Some setup scripts may overlap and try to install already installed packages.
 That is OK and intentional.
 
