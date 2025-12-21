@@ -50,3 +50,6 @@ I have not tested that.
 
 Setup scripts may update `~/.profile` and `~/.zshrc` to adjust PATH defaults.
 Where a `switch.sh` exists, it only repoints the `current` symlink.
+
+Feel free to contribute or fork; this repo is free to use. If you have any
+other questions, visit my site: https://starodubstev.consulting
