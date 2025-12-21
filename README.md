@@ -8,23 +8,14 @@ grow to cover other tools and system configs over time.
 
 ## Structure
 
-- `terminal/` - shell and terminal setup scripts (zsh, prompt, completions)
-- `git/` - Git tooling setup (GitHub CLI)
+This repo is organized into folders. Each folder has a `setup.sh` and a
+README with details for that area.
 
 ## Usage
 
-Run the setup script you want, for example:
+Run the root setup script:
 
 ```bash
 ./setup.sh
-./terminal/setup.sh
-./git/setup.sh
 ```
-
-After installing GitHub CLI, authenticate once:
-
-```bash
-gh auth login
-```
-
 After running, open a new terminal (or run `exec zsh`) to activate the changes.
