@@ -25,3 +25,11 @@ Some setup scripts may overlap and try to install already installed packages.
 That is OK and intentional.
 
 After running, open a new terminal (or run `exec zsh`) to activate the changes.
+
+## AI helpers
+
+This repo includes a lightweight AI agents setup under `.ai/`. If you use
+Codex or any other AI agent, point it at `.ai/` so it can follow the rules and
+use the command list to install items from the folders.
+This, along with the folder structure and READMEs, should be enough context
+for your AI companion to be helpful.
