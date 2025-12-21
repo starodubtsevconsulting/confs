@@ -18,3 +18,6 @@ Run:
 
 After install, open Vim and run `:PlugInstall` if plugins were not installed
 automatically.
+
+Respect: https://github.com/derekwyatt/vim-config and
+https://vimeo.com/6999927 (best ever).
