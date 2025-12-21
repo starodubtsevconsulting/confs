@@ -6,6 +6,7 @@ What it gives you:
 - Python 3.12.x in `~/python/3.12`
 - `~/python/current` symlink to the latest installed 3.12.x
 - pip and venv via the local install
+- `~/python/switch.sh` (or `python-switch`) to switch between installed versions
 
 Run:
 

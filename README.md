@@ -25,6 +25,10 @@ Run the root setup script:
 ```
 Tip: run `./check.sh` first to see what is already installed before deciding
 which folders to run.
+You can stack it with `./setup.sh` to compare what you have vs what each setup
+will install.
+For language runtimes, `v_matrix.json` controls the recommended versions per
+OS and whether the latest is installed alongside the selected one.
 
 Some setup scripts may overlap and try to install already installed packages.
 That is OK and intentional.

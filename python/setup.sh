@@ -114,6 +114,14 @@ ln -sfn "${PYTHON_HOME}/${latest_version}" "${PYTHON_HOME}/${PYTHON_SERIES}"
 
 "${PYTHON_HOME}/current/bin/python3" -m ensurepip --upgrade
 
+# Keep a copy in ~/python and expose a global helper
+cp "$script_dir/switch.sh" "$PYTHON_HOME/switch.sh"
+chmod +x "$PYTHON_HOME/switch.sh"
+
+mkdir -p "$HOME/bin"
+ln -sfn "$PYTHON_HOME/switch.sh" "$HOME/bin/python-switch"
+chmod +x "$HOME/bin/python-switch"
+
 profile="$HOME/.profile"
 block_start="# PYTHON_HOME_START"
 block_end="# PYTHON_HOME_END"
@@ -126,6 +134,26 @@ if ! grep -q "$block_start" "$profile" 2>/dev/null; then
     echo "export PATH=\"\$PYTHON_HOME/current/bin:\$PATH\""
     echo "$block_end"
   } >> "$profile"
+fi
+
+bin_block_start="# BIN_HOME_START"
+bin_block_end="# BIN_HOME_END"
+if ! grep -q "$bin_block_start" "$profile" 2>/dev/null; then
+  {
+    echo ""
+    echo "$bin_block_start"
+    echo "export PATH=\"\$HOME/bin:\$PATH\""
+    echo "$bin_block_end"
+  } >> "$profile"
+fi
+
+if ! grep -q "$bin_block_start" "$HOME/.zshrc" 2>/dev/null; then
+  {
+    echo ""
+    echo "$bin_block_start"
+    echo "export PATH=\"\$HOME/bin:\$PATH\""
+    echo "$bin_block_end"
+  } >> "$HOME/.zshrc"
 fi
 
 echo "Python ${latest_version} installed in ${PYTHON_HOME}/${latest_version}"
