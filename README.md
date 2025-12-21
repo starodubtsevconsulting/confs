@@ -33,3 +33,6 @@ Codex or any other AI agent, point it at `.ai/` so it can follow the rules and
 use the command list to install items from the folders.
 This, along with the folder structure and READMEs, should be enough context
 for your AI companion to be helpful.
+
+Note: the scripts are written for zsh/bash and should work on macOS too, but
+I have not tested that.
