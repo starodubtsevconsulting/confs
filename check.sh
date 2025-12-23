@@ -245,7 +245,9 @@ else
   print_item "scala latest dir" "MISSING"
 fi
 
-sbt_home="$HOME/scala/sbt"
+echo
+echo "sbt"
+sbt_home="$HOME/sbt"
 sbt_current="${sbt_home}/current/bin/sbt"
 if [ -x "$sbt_current" ]; then
   sbt_version="$("$sbt_current" --version 2>/dev/null | grep -oE '[0-9]+([.][0-9]+)*' | head -n1)"
@@ -253,7 +255,6 @@ if [ -x "$sbt_current" ]; then
 else
   print_item "sbt" "MISSING"
 fi
-
 if [ -x "${scala_home}/switch.sh" ]; then
   print_item "scala switch.sh" "OK"
 else

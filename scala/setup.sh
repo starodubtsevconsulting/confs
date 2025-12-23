@@ -230,6 +230,13 @@ mkdir -p "$HOME/bin"
 ln -sfn "$SCALA_HOME/switch.sh" "$HOME/bin/scala-switch"
 chmod +x "$HOME/bin/scala-switch"
 
+backup_file() {
+  local target="$1"
+  if [ -f "$target" ]; then
+    cp "$target" "${target}.$(date +%Y%m%d%H%M%S).sh.bk"
+  fi
+}
+
 add_path_block() {
   local file="$1"
   local scala_start="# SCALA_HOME_START"
@@ -237,24 +244,38 @@ add_path_block() {
   local bin_start="# BIN_HOME_START"
   local bin_end="# BIN_HOME_END"
 
-  if ! grep -q "$scala_start" "$file" 2>/dev/null; then
-    {
-      echo ""
-      echo "$scala_start"
-      echo "export SCALA_HOME=\"$SCALA_HOME\""
-      echo "export PATH=\"\$SCALA_HOME/current/bin:\$PATH\""
-      echo "$scala_end"
-    } >> "$file"
-  fi
+  backup_file "$file"
 
-  if ! grep -q "$bin_start" "$file" 2>/dev/null; then
-    {
-      echo ""
-      echo "$bin_start"
-      echo "export PATH=\"\$HOME/bin:\$PATH\""
-      echo "$bin_end"
-    } >> "$file"
-  fi
+  remove_block() {
+    local start="$1" end="$2" target="$3"
+    if [ -f "$target" ]; then
+      tmp="$(mktemp)"
+      awk -v s="$start" -v e="$end" '
+        $0==s {inside=1; next}
+        inside && $0==e {inside=0; next}
+        !inside {print}
+      ' "$target" > "$tmp"
+      mv "$tmp" "$target"
+    else
+      touch "$target"
+    fi
+  }
+
+  remove_block "$scala_start" "$scala_end" "$file"
+  remove_block "$bin_start" "$bin_end" "$file"
+
+  {
+    echo ""
+    echo "$scala_start"
+    echo "export SCALA_HOME=\"$SCALA_HOME\""
+    echo "export PATH=\"\$SCALA_HOME/current/bin:\$PATH\""
+    echo "$scala_end"
+    echo ""
+    echo "$bin_start"
+    echo "export PATH=\"\$HOME/bin:\$PATH\""
+    echo "$bin_end"
+  } >> "$file"
+
 }
 
 add_path_block "$HOME/.profile"
@@ -277,7 +298,6 @@ print_symlinks() {
 }
 
 runtime_inventory "$SCALA_HOME" "bin/scala" "Installed Scala versions" '[0-9]+([.][0-9]+)+'
-runtime_inventory "$SBT_HOME" "current/bin/sbt" "Installed sbt" '[0-9]+([.][0-9]+)+'
 
 print_symlinks
 

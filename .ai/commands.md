@@ -23,6 +23,7 @@ node-switch
 ./python/setup.sh
 ./java/setup.sh
 ./scala/setup.sh
+./sbt/setup.sh
 ./nodejs/setup.sh
 ```
 

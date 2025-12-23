@@ -71,7 +71,7 @@
     }
   ],
   "install_latest_scala": true,
-  "default_sbt_version": "1.10.2",
+  "default_sbt_version": "1.10.7",
   "default_java_major": "21",
   "ubuntu_to_java": [
     {
