@@ -9,6 +9,7 @@ Common actions for this repo:
 # Switch language versions
 python-switch
 java-switch
+scala-switch
 node-switch
 
 # Run all setups from the root
@@ -21,9 +22,11 @@ node-switch
 ./docker/setup.sh
 ./python/setup.sh
 ./java/setup.sh
+./scala/setup.sh
 ./nodejs/setup.sh
 ```
 
 Notes:
 - Run `./check.sh` first to decide whether to re-run a setup.
 - Reinstalling is OK; setups are idempotent where possible.
+- For adding a new language, follow `.ai/add-new.command.md`.

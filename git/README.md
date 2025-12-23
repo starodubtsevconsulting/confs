@@ -16,3 +16,5 @@ Run:
 ```bash
 ./setup.sh
 ```
+
+Note: setup may update `~/.profile` and `~/.zshrc` for PATH defaults.

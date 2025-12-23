@@ -217,6 +217,50 @@ else
 fi
 
 echo
+echo "Scala"
+scala_home="$HOME/scala"
+scala_current="${scala_home}/current/bin/scala"
+default_scala_version="3.4.1"
+
+if [ -x "$scala_current" ]; then
+  scala_version="$("$scala_current" -version 2>&1 | head -n1 | awk '{for(i=NF;i>=1;i--){if($i ~ /^[0-9]+([.][0-9]+)*$/){print $i; exit}}}')"
+  print_item "scala" "OK" "${scala_version:-unknown}"
+else
+  if has_cmd scala; then
+    print_item "scala" "SYSTEM"
+  else
+    print_item "scala" "MISSING"
+  fi
+fi
+
+if [ -d "${scala_home}/${default_scala_version}" ]; then
+  print_item "scala ${default_scala_version} dir" "OK"
+else
+  print_item "scala ${default_scala_version} dir" "MISSING"
+fi
+
+if [ -d "${scala_home}/latest" ]; then
+  print_item "scala latest dir" "OK"
+else
+  print_item "scala latest dir" "MISSING"
+fi
+
+sbt_home="$HOME/scala/sbt"
+sbt_current="${sbt_home}/current/bin/sbt"
+if [ -x "$sbt_current" ]; then
+  sbt_version="$("$sbt_current" --version 2>/dev/null | grep -oE '[0-9]+([.][0-9]+)*' | head -n1)"
+  print_item "sbt" "OK" "${sbt_version:-unknown}"
+else
+  print_item "sbt" "MISSING"
+fi
+
+if [ -x "${scala_home}/switch.sh" ]; then
+  print_item "scala switch.sh" "OK"
+else
+  print_item "scala switch.sh" "MISSING"
+fi
+
+echo
 echo "Node.js"
 node_home="$HOME/node"
 node_current="${node_home}/current/bin/node"
