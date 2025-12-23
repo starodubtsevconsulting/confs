@@ -11,6 +11,7 @@ SCALA_HOME="$HOME/scala"
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 matrix_file="$script_dir/../v_matrix.json"
 install_latest_scala="true"
+SCALA_LATEST_PIN=""
 
 # Load shared inventory helper
 if [ -f "$script_dir/../scripts/runtime-inventory.sh" ]; then
@@ -23,7 +24,7 @@ fi
 
 if [ -f "$matrix_file" ] && command -v python3 >/dev/null 2>&1; then
   codename="$(. /etc/os-release && echo "$VERSION_CODENAME")"
-  matrix_out="$(python3 - "$matrix_file" "$codename" <<'PY'
+matrix_out="$(python3 - "$matrix_file" "$codename" <<'PY'
 import json
 import sys
 
@@ -33,48 +34,58 @@ codename = sys.argv[2]
 with open(path, "r", encoding="utf-8") as fh:
     data = json.load(fh)
 
-version = data.get("default_scala_version")
-selected = None
+default_version = data.get("default_scala_version")
+current_codename = None
+current_version = None
+final_version = default_version
 for entry in data.get("ubuntu_to_scala", []):
     if entry.get("codename") == codename and entry.get("recommended_version"):
-        version = entry["recommended_version"]
-        break
-
-for entry in data.get("ubuntu_to_scala", []):
-    if entry.get("selected"):
-        selected = entry.get("codename")
-        break
+        final_version = entry["recommended_version"]
+    if entry.get("current") or entry.get("selected"):
+        current_codename = entry.get("codename")
+        if entry.get("recommended_version"):
+            current_version = entry["recommended_version"]
 
 install_latest = data.get("install_latest_scala", False)
+latest_pin = data.get("latest_scala_version")
 
-if version:
-    print(version)
-if selected:
-    print("SELECTED=" + selected)
+if current_codename and current_codename == codename and current_version:
+    final_version = current_version
+
+if final_version:
+    print("VERSION=" + final_version)
+if current_codename:
+    print("CURRENT=" + current_codename)
 print("INSTALL_LATEST=" + str(install_latest))
+if latest_pin:
+    print("LATEST_VERSION=" + latest_pin)
 PY
 )"
 
   if [ -n "$matrix_out" ]; then
-    version_line="$(printf "%s\n" "$matrix_out" | head -n1)"
-    selected_line="$(printf "%s\n" "$matrix_out" | sed -n '2p')"
-    install_line="$(printf "%s\n" "$matrix_out" | tail -n1)"
-    if [ -n "$version_line" ]; then
-      SCALA_VERSION="$version_line"
-    fi
-    if [ "${selected_line#SELECTED=}" != "$selected_line" ]; then
-      selected_codename="${selected_line#SELECTED=}"
-      if [ -n "$selected_codename" ] && [ "$selected_codename" != "$codename" ]; then
-        echo "Matrix check: WARNING - selected OS ($selected_codename) does not match this system ($codename)."
-      else
-        echo "Matrix check: OK - selected OS matches this system ($codename)."
-      fi
-    else
-      echo "Matrix check: WARNING - no selected OS in v_matrix.json."
-    fi
-    if [ "${install_line#INSTALL_LATEST=}" != "$install_line" ]; then
-      install_latest_scala="${install_line#INSTALL_LATEST=}"
-    fi
+    while IFS= read -r line; do
+      case "$line" in
+        VERSION=*)
+          SCALA_VERSION="${line#VERSION=}"
+          ;;
+        CURRENT=*|SELECTED=*)
+          current_codename="${line#*=}"
+          if [ -n "$current_codename" ] && [ "$current_codename" != "$codename" ]; then
+            echo "Matrix check: WARNING - current OS ($current_codename) does not match this system ($codename)."
+          else
+            echo "Matrix check: OK - current OS matches this system ($codename)."
+          fi
+          ;;
+        INSTALL_LATEST=*)
+          install_latest_scala="${line#INSTALL_LATEST=}"
+          ;;
+        LATEST_VERSION=*)
+          SCALA_LATEST_PIN="${line#LATEST_VERSION=}"
+          ;;
+      esac
+    done <<< "$matrix_out"
+  else
+    echo "Matrix check: WARNING - no current OS in v_matrix.json."
   fi
 else
   echo "Matrix check: SKIPPED - v_matrix.json missing or python3 not available."
@@ -125,13 +136,18 @@ detect_scala_version() {
 }
 
 fetch_latest_scala() {
+  if [ -n "$SCALA_LATEST_PIN" ]; then
+    echo "$SCALA_LATEST_PIN"
+    return 0
+  fi
+
   latest_tag="$(curl -I -Ls -o /dev/null -w '%{url_effective}' "https://github.com/scala/scala3/releases/latest" |
     sed -E 's#.*/tag/([^/]+).*#\1#')"
 
   if printf "%s" "$latest_tag" | grep -qE '^3\\.'; then
     echo "$latest_tag"
   else
-    # Fallback to the requested specific version if latest tag is unexpected
+    # Fallback to the requested specific version if tag is unexpected
     echo "$SCALA_VERSION"
   fi
 }

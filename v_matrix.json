@@ -61,16 +61,12 @@
     {
       "ubuntu": "24.04",
       "codename": "noble",
-      "recommended_version": "3.4.1"
-    },
-    {
-      "ubuntu": "24.04",
-      "codename": "noble",
       "recommended_version": "3.6.4",
-      "selected": "true"
+      "current": true
     }
   ],
   "install_latest_scala": true,
+  "latest_scala_version": "3.7.4",
   "default_sbt_version": "1.10.7",
   "default_java_major": "21",
   "ubuntu_to_java": [
