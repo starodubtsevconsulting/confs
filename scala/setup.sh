@@ -9,6 +9,9 @@ fi
 SCALA_VERSION="3.4.1"
 SCALA_HOME="$HOME/scala"
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+root_dir="$(cd "$script_dir/.." && pwd)"
+# shellcheck disable=SC1091
+source "$root_dir/scripts/report-log.sh"
 matrix_file="$script_dir/../v_matrix.json"
 install_latest_scala="true"
 SCALA_LATEST_PIN=""
@@ -122,6 +125,7 @@ cleanup() {
   fi
 }
 trap cleanup EXIT
+report_log_init "scala/setup.sh" "$root_dir"
 
 WORKDIR="$(mktemp -d)"
 

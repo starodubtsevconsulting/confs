@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck disable=SC1091
+source "$script_dir/scripts/report-log.sh"
+report_log_init "check.sh" "$script_dir"
+
 has_cmd() {
   command -v "$1" >/dev/null 2>&1
 }

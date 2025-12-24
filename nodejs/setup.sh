@@ -4,6 +4,9 @@ set -euo pipefail
 NODE_MAJOR="22"
 NODE_HOME="$HOME/node"
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+root_dir="$(cd "$script_dir/.." && pwd)"
+# shellcheck disable=SC1091
+source "$root_dir/scripts/report-log.sh"
 matrix_file="$script_dir/../v_matrix.json"
 
 if [ -f "$matrix_file" ] && command -v python3 >/dev/null 2>&1; then
@@ -89,6 +92,7 @@ cleanup() {
   fi
 }
 trap cleanup EXIT
+report_log_init "nodejs/setup.sh" "$root_dir"
 
 WORKDIR="$(mktemp -d)"
 

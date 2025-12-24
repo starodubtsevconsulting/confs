@@ -4,6 +4,9 @@ set -euo pipefail
 PYTHON_SERIES="3.12"
 PYTHON_HOME="$HOME/python"
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+root_dir="$(cd "$script_dir/.." && pwd)"
+# shellcheck disable=SC1091
+source "$root_dir/scripts/report-log.sh"
 
 if ! "$script_dir/../scripts/confirm-reinstall.sh" "Python" "test -x \"$HOME/python/current/bin/python3\""; then
   exit 0
@@ -67,11 +70,12 @@ cleanup() {
   fi
 }
 trap cleanup EXIT
+report_log_init "python/setup.sh" "$root_dir"
 
 WORKDIR="$(mktemp -d)"
 
 # Build dependencies for Python from source
-sudo apt update
+bash "$script_dir/../scripts/apt-update.sh"
 sudo apt install -y \
   build-essential \
   ca-certificates \
@@ -90,6 +94,7 @@ sudo apt install -y \
 
 latest_version="$(curl -fsSL https://www.python.org/ftp/python/ | \
   grep -oE "${PYTHON_SERIES}\\.([0-9]+)" | sort -V | tail -n1)"
+latest_version="${latest_version//$'\r'/}"
 
 if [ -z "$latest_version" ]; then
   echo "Failed to detect latest Python ${PYTHON_SERIES}.x version"
@@ -101,7 +106,14 @@ url="https://www.python.org/ftp/python/${latest_version}/${tarball}"
 
 mkdir -p "$PYTHON_HOME"
 cd "$WORKDIR"
-curl -fsSLO "$url"
+
+if ! curl -Ifs "$url" >/dev/null 2>&1; then
+  echo "Python tarball not found at:"
+  echo "  $url"
+  exit 1
+fi
+
+curl -fsSLo "$tarball" "$url"
 tar -xzf "$tarball"
 
 cd "Python-${latest_version}"
@@ -113,6 +125,11 @@ ln -sfn "${PYTHON_HOME}/${latest_version}" "${PYTHON_HOME}/current"
 ln -sfn "${PYTHON_HOME}/${latest_version}" "${PYTHON_HOME}/${PYTHON_SERIES}"
 
 "${PYTHON_HOME}/current/bin/python3" -m ensurepip --upgrade
+
+ln -sfn "${PYTHON_HOME}/current/bin/python3" "${PYTHON_HOME}/current/bin/python"
+if [ -x "${PYTHON_HOME}/current/bin/pip3" ]; then
+  ln -sfn "${PYTHON_HOME}/current/bin/pip3" "${PYTHON_HOME}/current/bin/pip"
+fi
 
 # Keep a copy in ~/python and expose a global helper
 cp "$script_dir/switch.sh" "$PYTHON_HOME/switch.sh"
