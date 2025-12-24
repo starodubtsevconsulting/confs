@@ -12,6 +12,9 @@ java-switch
 scala-switch
 node-switch
 
+# Switch git user for this repo (no --global)
+./git/switch-user.sh
+
 # Run all setups from the root
 ./setup.sh
 
