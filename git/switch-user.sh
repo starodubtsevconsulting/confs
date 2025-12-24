@@ -13,6 +13,7 @@ usage() {
 name=""
 email=""
 github_user=""
+github_token=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -57,15 +58,16 @@ select_from_user_list() {
 
   echo "Available git identities:" >&2
   local i=1
-  local entry label entry_name entry_email entry_gh
+  local entry label entry_name entry_email entry_gh entry_token
   parse_entry() {
     local in="$1"
-    local f1 f2 f3 f4
-    IFS='|' read -r f1 f2 f3 f4 <<<"$in"
+    local f1 f2 f3 f4 f5
+    IFS='|' read -r f1 f2 f3 f4 f5 <<<"$in"
     label="$f1"
     entry_name="$f2"
     entry_email="$f3"
     entry_gh="$f4"
+    entry_token="$f5"
   }
   for entry in "${GIT_USER_LIST[@]}"; do
     parse_entry "$entry"
@@ -93,6 +95,7 @@ select_from_user_list() {
     name="$entry_name"
     email="$entry_email"
     github_user="$entry_gh"
+    github_token="$entry_token"
     return 0
   fi
 
@@ -102,6 +105,7 @@ select_from_user_list() {
       name="$entry_name"
       email="$entry_email"
       github_user="$entry_gh"
+      github_token="$entry_token"
       return 0
     fi
   done
@@ -132,6 +136,23 @@ git -C "$root_dir" config user.name "$name"
 git -C "$root_dir" config user.email "$email"
 if [ -n "${github_user:-}" ]; then
   git -C "$root_dir" config github.user "$github_user"
+  git -C "$root_dir" config credential.username "$github_user"
+fi
+
+if [ -n "${github_user:-}" ] && [ -n "${github_token:-}" ]; then
+  git -C "$root_dir" config credential.helper store
+
+  creds_file="$HOME/.git-credentials"
+  tmp_file="$(mktemp)"
+
+  if [ -f "$creds_file" ]; then
+    # Remove any existing GitHub entry; keep all other credentials.
+    grep -vE '^https://[^@]+@github\.com/?$' "$creds_file" > "$tmp_file" || true
+  fi
+
+  printf "https://%s:%s@github.com\n" "$github_user" "$github_token" >> "$tmp_file"
+  mv "$tmp_file" "$creds_file"
+  chmod 600 "$creds_file" || true
 fi
 
 echo "Repo-local git identity set:"
@@ -139,4 +160,10 @@ echo "  user.name:  $(git -C "$root_dir" config user.name)"
 echo "  user.email: $(git -C "$root_dir" config user.email)"
 if git -C "$root_dir" config github.user >/dev/null 2>&1; then
   echo "  github.user: $(git -C "$root_dir" config github.user)"
+fi
+if git -C "$root_dir" config credential.username >/dev/null 2>&1; then
+  echo "  credential.username: $(git -C "$root_dir" config credential.username)"
+fi
+if git -C "$root_dir" config credential.helper >/dev/null 2>&1; then
+  echo "  credential.helper: $(git -C "$root_dir" config credential.helper)"
 fi
