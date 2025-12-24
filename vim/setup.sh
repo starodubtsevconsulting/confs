@@ -2,12 +2,16 @@
 set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+root_dir="$(cd "$script_dir/.." && pwd)"
+# shellcheck disable=SC1091
+source "$root_dir/scripts/report-log.sh"
+report_log_init "vim/setup.sh" "$root_dir"
 if ! "$script_dir/../scripts/confirm-reinstall.sh" "Vim" "command -v vim"; then
   exit 0
 fi
 
 # Install Vim and dependencies
-sudo apt update
+bash "$script_dir/../scripts/apt-update.sh"
 sudo apt install -y vim curl git
 
 # Backup existing vimrc if present
@@ -41,7 +45,7 @@ set clipboard=unnamedplus
 set termguicolors
 set background=dark
 
-colorscheme gruvbox
+silent! colorscheme gruvbox
 
 " Keep statusline simple (no special fonts required)
 let g:airline_powerline_fonts = 0
@@ -51,6 +55,10 @@ VIMRC
 if command -v vim >/dev/null 2>&1; then
   vim +PlugInstall +qall || true
 fi
+
+mkdir -p "$HOME/bin"
+cp "$script_dir/switch-theme.sh" "$HOME/bin/vim-switch-theme"
+chmod +x "$HOME/bin/vim-switch-theme"
 
 echo "Vim setup complete"
 echo
