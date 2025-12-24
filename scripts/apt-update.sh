@@ -45,7 +45,17 @@ disable_source_file() {
   local f="$1"
   local ts
   ts="$(date +%Y%m%d-%H%M%S)"
-  sudo mv "$f" "${f}.disabled.${ts}"
+  case "$f" in
+    *.sources)
+      sudo mv "$f" "${f%.sources}.disabled.${ts}.sources"
+      ;;
+    *.list)
+      sudo mv "$f" "${f%.list}.disabled.${ts}.list"
+      ;;
+    *)
+      sudo mv "$f" "${f}.disabled.${ts}"
+      ;;
+  esac
 }
 
 prompt_auto_disable() {
