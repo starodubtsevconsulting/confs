@@ -45,7 +45,7 @@ set clipboard=unnamedplus
 set termguicolors
 set background=dark
 
-colorscheme gruvbox
+silent! colorscheme gruvbox
 
 " Keep statusline simple (no special fonts required)
 let g:airline_powerline_fonts = 0
@@ -55,6 +55,10 @@ VIMRC
 if command -v vim >/dev/null 2>&1; then
   vim +PlugInstall +qall || true
 fi
+
+mkdir -p "$HOME/bin"
+cp "$script_dir/switch-theme.sh" "$HOME/bin/vim-switch-theme"
+chmod +x "$HOME/bin/vim-switch-theme"
 
 echo "Vim setup complete"
 echo
