@@ -6,6 +6,20 @@ root_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$root_dir/scripts/report-log.sh"
 report_log_init "setup.sh" "$root_dir"
 
+include_installed="${CONFS_SETUP_INCLUDE_INSTALLED:-}"
+
+is_module_installed() {
+  local module_dir="$1"
+  local check_script="$module_dir/is-installed.step.sh"
+
+  if [ -f "$check_script" ]; then
+    bash "$check_script"
+    return $?
+  fi
+
+  return 1
+}
+
 # Show current status before any installs
 if [ -x "$root_dir/check.sh" ]; then
   "$root_dir/check.sh"
@@ -27,9 +41,18 @@ if [ ${#scripts[@]} -eq 0 ]; then
 fi
 
 run_all=false
+any_ran=false
+any_missing=false
 
 for script in "${scripts[@]}"; do
   rel="${script#$root_dir/}"
+
+  module_dir="$root_dir/${rel%%/*}"
+  if [ -z "$include_installed" ] && is_module_installed "$module_dir"; then
+    echo "Skipping $rel (already installed)"
+    continue
+  fi
+  any_missing=true
 
   if [ "$run_all" = false ]; then
     while true; do
@@ -58,9 +81,15 @@ for script in "${scripts[@]}"; do
   if [ -n "$script" ]; then
     echo "Running $rel"
     bash "$script"
+    any_ran=true
   fi
 
 done
+
+if [ -z "$include_installed" ] && [ "$any_missing" = false ]; then
+  echo "All set. Nothing to install."
+  exit 0
+fi
 
 echo
 echo "=== README ==="

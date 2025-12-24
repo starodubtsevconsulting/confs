@@ -226,9 +226,38 @@ echo "Scala"
 scala_home="$HOME/scala"
 scala_current="${scala_home}/current/bin/scala"
 default_scala_version="3.4.1"
+expected_scala_version="$default_scala_version"
+matrix_file="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/v_matrix.json"
+if [ -f "$matrix_file" ] && command -v python3 >/dev/null 2>&1; then
+  codename="$(. /etc/os-release && echo "$VERSION_CODENAME")"
+  expected_from_matrix="$(python3 - "$matrix_file" "$codename" <<'PY'
+import json
+import sys
+
+path = sys.argv[1]
+codename = sys.argv[2]
+
+with open(path, "r", encoding="utf-8") as fh:
+    data = json.load(fh)
+
+ver = data.get("default_scala_version")
+for entry in data.get("ubuntu_to_scala", []):
+    if entry.get("codename") == codename and entry.get("recommended_version"):
+        ver = entry["recommended_version"]
+        break
+
+if ver:
+    print(ver)
+PY
+)"
+  expected_from_matrix="${expected_from_matrix//$'\r'/}"
+  if [ -n "$expected_from_matrix" ]; then
+    expected_scala_version="$expected_from_matrix"
+  fi
+fi
 
 if [ -x "$scala_current" ]; then
-  scala_version="$( (set +o pipefail; "$scala_current" -version 2>&1 | head -n1 | awk '{for(i=NF;i>=1;i--){if($i ~ /^[0-9]+([.][0-9]+)*$/){print $i; exit}}}') || true)"
+  scala_version="$( (set +o pipefail; "$scala_current" -version 2>&1 | grep -oE '[0-9]+([.][0-9]+)*' | head -n1) || true)"
   print_item "scala" "OK" "${scala_version:-unknown}"
 else
   if has_cmd scala; then
@@ -238,10 +267,10 @@ else
   fi
 fi
 
-if [ -d "${scala_home}/${default_scala_version}" ]; then
-  print_item "scala ${default_scala_version} dir" "OK"
+if [ -d "${scala_home}/${expected_scala_version}" ]; then
+  print_item "scala ${expected_scala_version} dir" "OK"
 else
-  print_item "scala ${default_scala_version} dir" "MISSING"
+  print_item "scala ${expected_scala_version} dir" "MISSING"
 fi
 
 if [ -d "${scala_home}/latest" ]; then

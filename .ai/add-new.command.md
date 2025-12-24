@@ -9,6 +9,7 @@ Use this checklist to add another language in the same style as Python/Java/Node
 
 2) Create a folder `<lang>/` with `setup.sh`, `switch.sh`, `post-setup.step.sh`, and `README.md`.
    - Follow existing setup patterns: home-local install (e.g., `~/lang`), `current` symlink, `~/bin/<lang>-switch`.
+   - Optional: add `<lang>/is-installed.step.sh` to let root `./setup.sh` detect whether the module is already installed.
    - Every executable script should append a short OK/FAIL line to `report.log` (this file is gitignored).
      Use `scripts/report.step.sh` and call `report_log_init "<label>" "$root_dir"`.
    - If you need an `apt update` in `setup.sh`, use the repo wrapper (currently `scripts/apt-update.sh`) instead of raw `sudo apt update`.
