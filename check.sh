@@ -188,7 +188,7 @@ java_current="${java_home}/current/bin/java"
 javac_current="${java_home}/current/bin/javac"
 
 if [ -x "$java_current" ]; then
-  java_major="$("$java_current" -version 2>&1 | head -n1 | sed -E 's/.*"([0-9]+).*/\\1/')"
+  java_major="$("$java_current" -version 2>&1 | head -n1 | sed -E 's/.*"([0-9]+).*/\1/')"
   print_item "java" "OK" "${java_major:-unknown}"
 else
   if has_cmd java; then
@@ -228,7 +228,7 @@ scala_current="${scala_home}/current/bin/scala"
 default_scala_version="3.4.1"
 
 if [ -x "$scala_current" ]; then
-  scala_version="$("$scala_current" -version 2>&1 | head -n1 | awk '{for(i=NF;i>=1;i--){if($i ~ /^[0-9]+([.][0-9]+)*$/){print $i; exit}}}')"
+  scala_version="$( (set +o pipefail; "$scala_current" -version 2>&1 | head -n1 | awk '{for(i=NF;i>=1;i--){if($i ~ /^[0-9]+([.][0-9]+)*$/){print $i; exit}}}') || true)"
   print_item "scala" "OK" "${scala_version:-unknown}"
 else
   if has_cmd scala; then
@@ -255,7 +255,7 @@ echo "sbt"
 sbt_home="$HOME/sbt"
 sbt_current="${sbt_home}/current/bin/sbt"
 if [ -x "$sbt_current" ]; then
-  sbt_version="$("$sbt_current" --version 2>/dev/null | grep -oE '[0-9]+([.][0-9]+)*' | head -n1)"
+  sbt_version="$( (set +o pipefail; "$sbt_current" --version 2>/dev/null | grep -oE '[0-9]+([.][0-9]+)*' | head -n1) || true)"
   print_item "sbt" "OK" "${sbt_version:-unknown}"
 else
   print_item "sbt" "MISSING"
