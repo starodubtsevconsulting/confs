@@ -2,12 +2,16 @@
 set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+root_dir="$(cd "$script_dir/.." && pwd)"
+# shellcheck disable=SC1091
+source "$root_dir/scripts/report-log.sh"
+report_log_init "docker/setup.sh" "$root_dir"
 if ! "$script_dir/../scripts/confirm-reinstall.sh" "Docker" "command -v docker"; then
   exit 0
 fi
 
 # Install Docker Engine from the official Docker repo
-sudo apt update
+bash "$script_dir/../scripts/apt-update.sh"
 sudo apt install -y ca-certificates curl gnupg
 
 sudo install -m 0755 -d /etc/apt/keyrings
@@ -20,7 +24,7 @@ arch="$(dpkg --print-architecture)"
 echo "deb [arch=${arch} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu ${codename} stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
 
-sudo apt update
+bash "$script_dir/../scripts/apt-update.sh"
 # Remove conflicting Ubuntu packages if present
 sudo apt remove -y docker.io containerd runc || true
 
@@ -33,6 +37,8 @@ sudo systemctl enable --now docker
 if getent group docker >/dev/null 2>&1; then
   sudo usermod -aG docker "$USER"
 fi
+
+bash "$script_dir/post-setup.step.sh"
 
 echo "Docker installed. Log out/in or run: newgrp docker"
 echo

@@ -18,6 +18,12 @@
 # This script may modify system state only in auto-disable mode.
 set -euo pipefail
 
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+root_dir="$(cd "$script_dir/.." && pwd)"
+# shellcheck disable=SC1091
+source "$root_dir/scripts/report-log.sh"
+report_log_init "scripts/apt-update.sh" "$root_dir"
+
 AUTO_DISABLE_BROKEN_APT_SOURCES="${CONFS_AUTO_DISABLE_BROKEN_APT_SOURCES:-}"
 
 run_update() {

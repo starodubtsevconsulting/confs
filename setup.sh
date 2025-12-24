@@ -2,6 +2,9 @@
 set -euo pipefail
 
 root_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck disable=SC1091
+source "$root_dir/scripts/report-log.sh"
+report_log_init "setup.sh" "$root_dir"
 
 # Show current status before any installs
 if [ -x "$root_dir/check.sh" ]; then

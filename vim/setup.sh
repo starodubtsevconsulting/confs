@@ -2,12 +2,16 @@
 set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+root_dir="$(cd "$script_dir/.." && pwd)"
+# shellcheck disable=SC1091
+source "$root_dir/scripts/report-log.sh"
+report_log_init "vim/setup.sh" "$root_dir"
 if ! "$script_dir/../scripts/confirm-reinstall.sh" "Vim" "command -v vim"; then
   exit 0
 fi
 
 # Install Vim and dependencies
-sudo apt update
+bash "$script_dir/../scripts/apt-update.sh"
 sudo apt install -y vim curl git
 
 # Backup existing vimrc if present
