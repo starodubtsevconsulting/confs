@@ -19,3 +19,4 @@
 7. create PR (use data from plan.md for the final descriptive comment what was done in PR, see `.ai/pr.command.md` for details)
 8. before merging: add/update a descriptive PR comment (based on plan.md) so reviewers see what changed and how to verify
 9. do not merge PRs automatically; only merge when explicitly asked
+10. after PR is merged: delete the branch and switch back to `main` (synced to `origin/main`)
