@@ -86,6 +86,9 @@ After running, open a new terminal (or run `exec zsh`) to activate the changes.
 This repo includes a lightweight AI agents setup under `.ai/`. If you use
 Codex or any other AI agent, point it at `.ai/` so it can follow the rules and
 use the command list to install items from the folders.
+This `.ai/` folder is my simplified AI workflow that I now reuse across other
+projects as well: rules + `*.command.md` files that keep the agent consistent
+and make day-to-day maintenance cheap.
 This, along with the folder structure and READMEs, should be enough context
 for your AI companion to be helpful.
 
