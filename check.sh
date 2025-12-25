@@ -6,6 +6,8 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/scripts/report-log.sh"
 report_log_init "check.sh" "$script_dir"
 
+missing_count=0
+
 has_cmd() {
   command -v "$1" >/dev/null 2>&1
 }
@@ -25,6 +27,7 @@ print_item() {
     MISSING)
       mark="[ ]"
       tag="MISSING"
+      missing_count=$((missing_count + 1))
       ;;
     *)
       mark="[~]"
@@ -321,4 +324,11 @@ if [ -x "${node_home}/switch.sh" ]; then
   print_item "node switch.sh" "OK"
 else
   print_item "node switch.sh" "MISSING"
+fi
+
+echo
+if [ "$missing_count" -eq 0 ]; then
+  echo "All good. Nothing to install."
+else
+  echo "Missing: $missing_count"
 fi

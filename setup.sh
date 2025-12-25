@@ -11,26 +11,24 @@ include_installed="${CONFS_SETUP_INCLUDE_INSTALLED:-}"
 is_module_installed() {
   local module_dir="$1"
   local check_script="$module_dir/is-installed.step.sh"
+  local module_name
+  local fallback_check_script
+
+  module_name="$(basename "$module_dir")"
+  fallback_check_script="$root_dir/scripts/is-installed/${module_name}.step.sh"
 
   if [ -f "$check_script" ]; then
     bash "$check_script"
     return $?
   fi
 
+  if [ -f "$fallback_check_script" ]; then
+    bash "$fallback_check_script"
+    return $?
+  fi
+
   return 1
 }
-
-# Show current status before any installs
-if [ -x "$root_dir/check.sh" ]; then
-  "$root_dir/check.sh"
-  echo
-  printf "Continue with setup? [Y/NO]: "
-  read -r proceed
-  if [ "${proceed^^}" != "Y" ]; then
-    echo "Aborting."
-    exit 0
-  fi
-fi
 
 # Find all setup.sh scripts under subdirectories (exclude root)
 mapfile -t scripts < <(find "$root_dir" -mindepth 2 -type f -name "setup.sh" | sort)
@@ -42,7 +40,41 @@ fi
 
 run_all=false
 any_ran=false
-any_missing=false
+
+missing_scripts=()
+
+for script in "${scripts[@]}"; do
+  rel="${script#$root_dir/}"
+
+  module_dir="$root_dir/${rel%%/*}"
+  if [ -z "$include_installed" ] && is_module_installed "$module_dir"; then
+    continue
+  fi
+
+  missing_scripts+=("$script")
+
+done
+
+# Show current status before any installs
+if [ -x "$root_dir/check.sh" ]; then
+  "$root_dir/check.sh"
+fi
+
+if [ -z "$include_installed" ] && [ ${#missing_scripts[@]} -eq 0 ]; then
+  echo
+  echo "Nothing to install."
+  exit 0
+fi
+
+if [ -x "$root_dir/check.sh" ]; then
+  echo
+  printf "Continue with setup? [Y/NO]: "
+  read -r proceed
+  if [ "${proceed^^}" != "Y" ]; then
+    echo "Aborting."
+    exit 0
+  fi
+fi
 
 for script in "${scripts[@]}"; do
   rel="${script#$root_dir/}"
@@ -52,7 +84,6 @@ for script in "${scripts[@]}"; do
     echo "Skipping $rel (already installed)"
     continue
   fi
-  any_missing=true
 
   if [ "$run_all" = false ]; then
     while true; do
@@ -85,11 +116,6 @@ for script in "${scripts[@]}"; do
   fi
 
 done
-
-if [ -z "$include_installed" ] && [ "$any_missing" = false ]; then
-  echo "All set. Nothing to install."
-  exit 0
-fi
 
 echo
 echo "=== README ==="
