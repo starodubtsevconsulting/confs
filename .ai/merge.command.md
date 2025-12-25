@@ -15,7 +15,7 @@ Squash-merge a PR and keep all PR comments/discussion (GitHub keeps them automat
 
 ## Merge (recommended: squash)
 
-If you prefer a helper script, see `scripts/gh-merge.step.sh`.
+If you prefer a helper script, see `bash ./scripts/gh-merge.command.sh`.
 
 ### 1) Verify mergeability
 
