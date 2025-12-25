@@ -4,6 +4,7 @@
    - if you accidentally committed on `main`: extract those commit(s) onto a feature branch and reset local `main` to match `origin/main` (so `main` has NO extra commits).
 
 1. create a branch for the work
+   - naming: `feature/<name>`, `fix/<name>`, or `refactoring/<name>` (use kebab-case)
 2. keep plan.md do not commit it (git ignore) and keep it up to date
 3. update `.ai/*.md` if needed
    - rule: if you change `dev-workflow.md`, consider updating the relevant `*.command.md`.
