@@ -6,6 +6,8 @@
 1. create a branch for the work
 2. keep plan.md do not commit it (git ignore) and keep it up to date
 3. update `.ai/*.md` if needed
+   - rule: if you change `dev-workflow.md`, consider updating the relevant `*.command.md`.
+   - rule: if you add/update a `*.command.md`, consider adding/updating a helper `scripts/*.step.sh` to automate it.
 4. before committing/pushing, switch/check repo-local git user (do NOT use `--global`) (see `.ai/commit.command.md` for identity setup):
    - `./git/switch-user.sh`
 5. git commit every logical step immediately (do not wait / do not batch unrelated work) with a descriptive message (see `.ai/commit.command.md` for details)
