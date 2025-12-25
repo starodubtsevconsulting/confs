@@ -34,4 +34,4 @@ Notes:
 - Run `./check.sh` first to decide whether to re-run a setup.
 - Reinstalling is OK; setups are idempotent where possible.
 - For adding a new language, follow `.ai/add-new.command.md`.
-- When adding/updating a `*.command.md`, consider adding/updating a matching `scripts/*.step.sh` helper to reduce repetitive or expensive manual steps.
+- When adding/updating a `*.command.md`, consider adding/updating a matching `scripts/*.command.sh` backend helper to reduce repetitive or expensive manual steps, and a matching `scripts/*.step.sh` helper for additional manual steps.
