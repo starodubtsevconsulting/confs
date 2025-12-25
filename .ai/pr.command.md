@@ -3,6 +3,7 @@
 ## See also
 - `.ai/dev-workflow.md`
 - `.ai/push.command.md`
+- `.ai/merge.command.md`
 
 ## Goal
 Create or update a GitHub Pull Request for the current feature branch.
@@ -57,6 +58,12 @@ Just push again:
 ```bash
 git push
 ```
+
+## Required: PR comment
+Before merging, add/update a descriptive PR comment based on `plan.md`:
+- what changed
+- why
+- how to verify
 
 ## Without GitHub CLI (manual)
 After pushing, GitHub prints a URL like:

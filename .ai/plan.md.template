@@ -1,0 +1,31 @@
+# plan.md
+
+This file is intentionally gitignored.
+Copy this template to `plan.md` and keep it updated throughout the work.
+
+## Scope
+- [ ] Define the goal
+- [ ] Define non-goals
+- [ ] Identify modules/files impacted
+
+## Plan
+- [ ] Step 1
+- [ ] Step 2
+- [ ] Step 3
+
+## Progress / Notes
+- [ ] What was done (links 강조: commits/PRs)
+- [ ] What is blocked
+- [ ] Next actions
+
+## Verification
+- [ ] How to verify locally
+- [ ] Expected output
+
+## PR comment draft
+- What changed:
+  - 
+- Why:
+  - 
+- How to verify:
+  - 
