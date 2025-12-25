@@ -92,6 +92,14 @@ and make day-to-day maintenance cheap.
 This, along with the folder structure and READMEs, should be enough context
 for your AI companion to be helpful.
 
+Another reason this project exists is to support my work on other projects.
+Whenever I work on a different project, I reference this `confs` repo in the
+`.ai/` markdown files for common dev workflow commands (commit, push, PR, merge).
+This approach keeps sensitive data (like GitHub tokens) secure because the
+commands are wrapped in `.ai/scripts/*.command.sh` files that read credentials
+from local config files (e.g. `git/.users-list.conf`), so the AI agent never
+sees or exposes secrets directly.
+
 Note: the scripts are written for zsh/bash and should work on macOS too, but
 I have not tested that.
 
