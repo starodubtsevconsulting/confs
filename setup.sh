@@ -30,18 +30,6 @@ is_module_installed() {
   return 1
 }
 
-# Show current status before any installs
-if [ -x "$root_dir/check.sh" ]; then
-  "$root_dir/check.sh"
-  echo
-  printf "Continue with setup? [Y/NO]: "
-  read -r proceed
-  if [ "${proceed^^}" != "Y" ]; then
-    echo "Aborting."
-    exit 0
-  fi
-fi
-
 # Find all setup.sh scripts under subdirectories (exclude root)
 mapfile -t scripts < <(find "$root_dir" -mindepth 2 -type f -name "setup.sh" | sort)
 
@@ -52,7 +40,41 @@ fi
 
 run_all=false
 any_ran=false
-any_missing=false
+
+missing_scripts=()
+
+for script in "${scripts[@]}"; do
+  rel="${script#$root_dir/}"
+
+  module_dir="$root_dir/${rel%%/*}"
+  if [ -z "$include_installed" ] && is_module_installed "$module_dir"; then
+    continue
+  fi
+
+  missing_scripts+=("$script")
+
+done
+
+# Show current status before any installs
+if [ -x "$root_dir/check.sh" ]; then
+  "$root_dir/check.sh"
+fi
+
+if [ -z "$include_installed" ] && [ ${#missing_scripts[@]} -eq 0 ]; then
+  echo
+  echo "Nothing to install."
+  exit 0
+fi
+
+if [ -x "$root_dir/check.sh" ]; then
+  echo
+  printf "Continue with setup? [Y/NO]: "
+  read -r proceed
+  if [ "${proceed^^}" != "Y" ]; then
+    echo "Aborting."
+    exit 0
+  fi
+fi
 
 for script in "${scripts[@]}"; do
   rel="${script#$root_dir/}"
@@ -62,7 +84,6 @@ for script in "${scripts[@]}"; do
     echo "Skipping $rel (already installed)"
     continue
   fi
-  any_missing=true
 
   if [ "$run_all" = false ]; then
     while true; do
@@ -95,11 +116,6 @@ for script in "${scripts[@]}"; do
   fi
 
 done
-
-if [ -z "$include_installed" ] && [ "$any_missing" = false ]; then
-  echo "All set. Nothing to install."
-  exit 0
-fi
 
 echo
 echo "=== README ==="
