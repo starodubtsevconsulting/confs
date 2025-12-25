@@ -29,13 +29,13 @@ gh auth login
 If you already use `./git/switch-user.sh` + `git/.users-list.conf` (with a PAT token), you can authenticate `gh` using the repo helper:
 
 ```bash
-bash ./scripts/gh-auth.command.sh
+bash ./.ai/scripts/gh-auth.command.sh
 ```
 
 If `git/.users-list.conf` has exactly one entry with a token, you can create the PR in one command:
 
 ```bash
-bash ./scripts/gh-pr.command.sh
+bash ./.ai/scripts/gh-pr.command.sh
 ```
 
 If you prefer non-interactive auth, set `GH_TOKEN` in your environment (do not commit it).
