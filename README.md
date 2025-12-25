@@ -73,7 +73,7 @@ contains only one Ubuntu codename. I do not run experimental Linux versions.
 Sometimes installing the latest toolchains (e.g. Python) on a given distro can
 be hard when the OS is too old (missing packages) or too new (ecosystem not
 ready yet). The LTS release tends to be the sweet spot.
-If you need support for another Ubuntu release, add your codename/version entry
+If you need support for another Ubuntu (or your favorite distribution) release, add your codename/version entry
 to the matrix.
 
 Some setup scripts may overlap and try to install already installed packages.
