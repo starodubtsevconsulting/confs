@@ -5,7 +5,9 @@
 
 1. create a branch for the work
    - naming: `feature/<name>`, `fix/<name>`, or `refactoring/<name>` (use kebab-case)
-2. keep plan.md do not commit it (git ignore) and keep it up to date
+2. create and maintain plan.md (do not commit it; it is gitignored)
+   - plan.md is the working checklist for the task (checkboxes): what we do, what is done, what is left
+   - use plan.md as the source for PR comments / final report (what changed, why, how to verify)
 3. update `.ai/*.md` if needed
    - rule: if you change `dev-workflow.md`, consider updating the relevant `*.command.md`.
    - rule: if you add/update a `*.command.md`, consider adding/updating a helper `scripts/*.step.sh` to automate it.
