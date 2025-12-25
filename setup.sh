@@ -11,9 +11,19 @@ include_installed="${CONFS_SETUP_INCLUDE_INSTALLED:-}"
 is_module_installed() {
   local module_dir="$1"
   local check_script="$module_dir/is-installed.step.sh"
+  local module_name
+  local fallback_check_script
+
+  module_name="$(basename "$module_dir")"
+  fallback_check_script="$root_dir/scripts/is-installed/${module_name}.step.sh"
 
   if [ -f "$check_script" ]; then
     bash "$check_script"
+    return $?
+  fi
+
+  if [ -f "$fallback_check_script" ]; then
+    bash "$fallback_check_script"
     return $?
   fi
 
