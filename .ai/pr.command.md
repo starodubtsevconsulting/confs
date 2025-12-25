@@ -31,6 +31,12 @@ If you already use `./git/switch-user.sh` + `git/.users-list.conf` (with a PAT t
 ./scripts/gh-auth.step.sh
 ```
 
+If `git/.users-list.conf` has exactly one entry with a token, you can create the PR in one command:
+
+```bash
+./scripts/gh-pr.step.sh
+```
+
 If you prefer non-interactive auth, set `GH_TOKEN` in your environment (do not commit it).
 
 ### 2) Create PR
