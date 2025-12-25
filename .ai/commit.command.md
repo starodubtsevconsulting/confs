@@ -55,6 +55,6 @@ Example:
 Centralize install checks under scripts/is-installed
 
 - Add scripts/is-installed.step.sh helper
-- Use scripts/is-installed/<module>.step.sh for generic modules
+- Use scripts/is-installed.common.step.sh for generic modules
 - Keep module-local is-installed.step.sh only for special cases (e.g. scala)
 ```
