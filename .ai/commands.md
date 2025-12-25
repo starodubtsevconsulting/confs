@@ -34,8 +34,8 @@ Notes:
 - Run `./check.sh` first to decide whether to re-run a setup.
 - Reinstalling is OK; setups are idempotent where possible.
 - For adding a new language, follow `.ai/add-new.command.md`.
-- When adding/updating a `*.command.md`, consider adding/updating a matching script in `scripts/`.
+- When adding/updating a `*.command.md`, consider adding/updating a matching script in `.ai/scripts/`.
 
 Script naming:
-- `scripts/*.command.sh` is only for scripts that act as the backend for a `.ai/*.command.md` (meant to be run directly by you).
+- `.ai/scripts/*.command.sh` is only for scripts that act as the backend for a `.ai/*.command.md` (meant to be run directly by you).
 - `scripts/*.step.sh` is for helper steps used by other scripts/modules (not a command backend).

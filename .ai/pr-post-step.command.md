@@ -10,13 +10,13 @@ After a PR is merged: switch back to `main`, sync it to `origin/main`, and delet
 ## Recommended (use helper script)
 
 ```bash
-bash ./scripts/pr-post-step.command.sh <branch-name>
+bash ./.ai/scripts/pr-post-step.command.sh <branch-name>
 ```
 
 Example:
 
 ```bash
-bash ./scripts/pr-post-step.command.sh fix/dev-workflow-commit-immediately
+bash ./.ai/scripts/pr-post-step.command.sh fix/dev-workflow-commit-immediately
 ```
 
 ## Manual steps (reference)
