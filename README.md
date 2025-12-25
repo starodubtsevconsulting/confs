@@ -68,6 +68,11 @@ will install.
 For language runtimes, `v_matrix.json` controls the recommended versions per
 OS and whether the latest is installed alongside the selected one.
 
+I typically stick to the latest Ubuntu LTS release, so `v_matrix.json` usually
+contains only one Ubuntu codename. I do not run experimental Linux versions.
+If you need support for another Ubuntu release, add your codename/version entry
+to the matrix.
+
 Some setup scripts may overlap and try to install already installed packages.
 That is OK and intentional.
 
