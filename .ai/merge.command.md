@@ -3,6 +3,7 @@
 ## See also
 - `.ai/dev-workflow.md`
 - `.ai/pr.command.md`
+- `.ai/pr-post-step.command.md`
 
 ## Goal
 Squash-merge a PR and keep all PR comments/discussion (GitHub keeps them automatically).
@@ -13,6 +14,8 @@ Squash-merge a PR and keep all PR comments/discussion (GitHub keeps them automat
 - No merge conflicts.
 
 ## Merge (recommended: squash)
+
+If you prefer a helper script, see `scripts/gh-merge.step.sh`.
 
 ### 1) Verify mergeability
 
