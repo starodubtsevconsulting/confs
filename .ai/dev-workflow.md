@@ -6,6 +6,7 @@
 1. create a branch for the work
    - naming: `feature/<name>`, `fix/<name>`, or `refactoring/<name>` (use kebab-case)
 2. create and maintain plan.md (do not commit it; it is gitignored)
+   - at the start of new work: reset it (e.g. `cp plan.md.template plan.md`) so it reflects only the current task
    - plan.md is the working checklist for the task (checkboxes): what we do, what is done, what is left
    - use plan.md as the source for PR comments / final report (what changed, why, how to verify)
 3. update `.ai/*.md` if needed
