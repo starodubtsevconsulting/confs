@@ -11,3 +11,4 @@
 5. git commit every logical step immediately (do not wait / do not batch unrelated work) with a descriptive message (see `.ai/commit.command.md` for details)
 6. git push (see `.ai/push.command.md` for details)
 7. create PR (use data from plan.md for the final descriptive comment what was done in PR, see `.ai/pr.command.md` for details)
+8. before merging: add/update a descriptive PR comment (based on plan.md) so reviewers see what changed and how to verify
