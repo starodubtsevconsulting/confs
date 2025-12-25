@@ -68,6 +68,14 @@ will install.
 For language runtimes, `v_matrix.json` controls the recommended versions per
 OS and whether the latest is installed alongside the selected one.
 
+I typically stick to the latest Ubuntu LTS release, so `v_matrix.json` usually
+contains only one Ubuntu codename. I do not run experimental Linux versions.
+Sometimes installing the latest toolchains (e.g. Python) on a given distro can
+be hard when the OS is too old (missing packages) or too new (ecosystem not
+ready yet). The LTS release tends to be the sweet spot.
+If you need support for another Ubuntu release, add your codename/version entry
+to the matrix.
+
 Some setup scripts may overlap and try to install already installed packages.
 That is OK and intentional.
 
@@ -78,6 +86,9 @@ After running, open a new terminal (or run `exec zsh`) to activate the changes.
 This repo includes a lightweight AI agents setup under `.ai/`. If you use
 Codex or any other AI agent, point it at `.ai/` so it can follow the rules and
 use the command list to install items from the folders.
+This `.ai/` folder is my simplified AI workflow that I now reuse across other
+projects as well: rules + `*.command.md` files that keep the agent consistent
+and make day-to-day maintenance cheap.
 This, along with the folder structure and READMEs, should be enough context
 for your AI companion to be helpful.
 
