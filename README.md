@@ -11,6 +11,24 @@ predictable home-folder installs (e.g. `~/node/25`, `~/java/21-aws`) so scripts
 always know where to look. It might not match how others do it, but it works
 for me. I may add a server-focused repo later.
 
+## Philosophy
+
+This repo follows a simple workflow:
+- `setup.sh`: install/setup everything in one run (or cherry-pick folder setups).
+- `switch.sh`: switch between versions/users by repointing symlinks or updating local config.
+- config scripts: additional small tweaks when needed.
+
+For tools where I need multiple versions (e.g. Java, Python, Scala), I prefer
+installing into the home folder and switching explicitly. I do not want a full
+version manager stack for every language; I only need a few predictable wrapper
+commands.
+
+For tools where a single global install is enough (e.g. Git tooling, Docker), it
+is OK to install system-wide.
+
+Think of it as a lightweight “Nx-style” repo, but for installing and setting up
+development tooling.
+
 ## Structure
 
 This repo is organized into folders. Each folder has a `setup.sh` and a
