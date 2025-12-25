@@ -36,6 +36,24 @@ README with details for that area.
 
 ## Usage
 
+## How I use it
+
+I clone this repo into my home folder (e.g. `~/confs`) so it is always easy to
+find, then run everything from there.
+
+Typical flow:
+- `./check.sh`
+- `./setup.sh`
+- use per-folder `switch.sh` where available
+
+I use this repo almost daily (installing/reinstalling, switching versions,
+moving between laptop/desktop, testing other projects against different Python /
+Java / Scala versions), so it is naturally kept up to date.
+
+Maintenance is intentionally lightweight: I use AI, but it must follow the
+workflow under `.ai/` (plan.md -> commit small steps -> PR comment -> merge on
+request), which makes it easy to keep this repo consistent.
+
 Before doing anything, run `./check.sh` to see what is already installed.
 
 Run the root setup script:
