@@ -25,6 +25,12 @@ Run once per machine/session:
 gh auth login
 ```
 
+If you already use `./git/switch-user.sh` + `git/.users-list.conf` (with a PAT token), you can authenticate `gh` using the repo helper:
+
+```bash
+./scripts/gh-auth.step.sh
+```
+
 If you prefer non-interactive auth, set `GH_TOKEN` in your environment (do not commit it).
 
 ### 2) Create PR
