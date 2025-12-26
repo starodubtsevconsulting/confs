@@ -1,169 +1,326 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/bash
 
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-root_dir="$(cd "$script_dir/.." && pwd)"
-users_conf_file="$script_dir/.users-list.conf"
+# setup-git.sh
+# One-time setup script to configure Git credential storage
+# This allows automated git push without exposing credentials
 
-usage() {
-  echo "Usage: $0 [--name <name>] [--email <email>]" >&2
-  echo "Sets git user.name and user.email for this repo only (no --global)." >&2
+set -e
+
+
+ensure_credential_store_helper() {
+  CURRENT_HELPER=$(git config --global credential.helper 2>/dev/null || echo "")
+  if [ "$CURRENT_HELPER" != "store" ]; then
+    git config --global credential.helper store
+  fi
 }
 
-name=""
-email=""
-github_user=""
-github_token=""
+ensure_credential_store_helper
 
-while [ $# -gt 0 ]; do
-  case "$1" in
-    --name)
-      name="${2-}"
-      shift 2
-      ;;
-    --email)
-      email="${2-}"
-      shift 2
-      ;;
-    -h|--help)
-      usage
-      exit 0
-      ;;
-    *)
-      echo "Unknown argument: $1" >&2
-      usage
-      exit 2
-      ;;
-  esac
-done
+set_git_user_config() {
+  local new_name="${1:-}"
+  local new_email="${2:-}"
+  local new_cred_user="${3:-}"
 
-select_from_user_list() {
-  if [ ! -f "$users_conf_file" ]; then
-    return 1
+  if [ -n "$new_name" ]; then
+    git config --global user.name "$new_name"
+    echo "✓ Set user.name to: $new_name"
   fi
 
-  local -a GIT_USER_LIST=()
-  while IFS= read -r line || [ -n "$line" ]; do
-    case "$line" in
-      ''|\#*)
-        continue
-        ;;
-    esac
-    GIT_USER_LIST+=("$line")
-  done < "$users_conf_file"
-
-  if [ "${#GIT_USER_LIST[@]}" -eq 0 ]; then
-    return 1
+  if [ -n "$new_email" ]; then
+    git config --global user.email "$new_email"
+    echo "✓ Set user.email to: $new_email"
   fi
 
-  echo "Available git identities:" >&2
-  local i=1
-  local entry label entry_name entry_email entry_gh entry_token
-  parse_entry() {
-    local in="$1"
-    local f1 f2 f3 f4 f5
-    IFS='|' read -r f1 f2 f3 f4 f5 <<<"$in"
-    label="$f1"
-    entry_name="$f2"
-    entry_email="$f3"
-    entry_gh="$f4"
-    entry_token="$f5"
-  }
-  for entry in "${GIT_USER_LIST[@]}"; do
-    parse_entry "$entry"
-    if [ -n "$entry_gh" ]; then
-      printf "  %d) %s (%s <%s>) gh:%s\n" "$i" "$label" "$entry_name" "$entry_email" "$entry_gh" >&2
-    else
-      printf "  %d) %s (%s <%s>)\n" "$i" "$label" "$entry_name" "$entry_email" >&2
-    fi
-    i=$((i + 1))
-  done
-  echo "" >&2
-  printf "Choose identity by number, label, or github username (or press Enter for manual): " >&2
-  read -r choice
-
-  if [ -z "$choice" ]; then
-    return 1
+  if [ -n "$new_cred_user" ]; then
+    git config --global credential.username "$new_cred_user"
+    echo "✓ Set credential.username to: $new_cred_user"
   fi
+}
 
-  if [[ "$choice" =~ ^[0-9]+$ ]]; then
-    if [ "$choice" -lt 1 ] || [ "$choice" -gt "${#GIT_USER_LIST[@]}" ]; then
-      return 1
-    fi
-    entry="${GIT_USER_LIST[$((choice - 1))]}"
-    parse_entry "$entry"
-    name="$entry_name"
-    email="$entry_email"
-    github_user="$entry_gh"
-    github_token="$entry_token"
+profile_key_name() {
+  local cred_user="$1"
+  printf '%s' "switch-user.profile.${cred_user}.name"
+}
+
+profile_key_email() {
+  local cred_user="$1"
+  printf '%s' "switch-user.profile.${cred_user}.email"
+}
+
+get_profile_users() {
+  local keys
+  keys=$(git config --global --name-only --get-regexp '^switch-user\.profile\..*\.(name|email)$' 2>/dev/null || true)
+  if [ -z "$keys" ]; then
     return 0
   fi
 
-  for entry in "${GIT_USER_LIST[@]}"; do
-    parse_entry "$entry"
-    if [ "$label" = "$choice" ] || { [ -n "$entry_gh" ] && [ "$entry_gh" = "$choice" ]; }; then
-      name="$entry_name"
-      email="$entry_email"
-      github_user="$entry_gh"
-      github_token="$entry_token"
-      return 0
-    fi
-  done
-
-  return 1
+  echo "$keys" | sed -n 's/^switch-user\.profile\.\([^\.]*\)\..*$/\1/p' | sort -u
 }
 
-if [ -z "$name" ] || [ -z "$email" ]; then
-  select_from_user_list || true
-fi
+has_profile_for_user() {
+  local cred_user="$1"
+  if [ -z "$cred_user" ]; then
+    return 1
+  fi
+  git config --global --get "$(profile_key_name "$cred_user")" >/dev/null 2>&1 || return 1
+  git config --global --get "$(profile_key_email "$cred_user")" >/dev/null 2>&1 || return 1
+  return 0
+}
 
-if [ -z "$name" ]; then
-  printf "Git user.name for this repo: " >&2
-  read -r name
-fi
-
-if [ -z "$email" ]; then
-  printf "Git user.email for this repo: " >&2
-  read -r email
-fi
-
-if [ -z "$name" ] || [ -z "$email" ]; then
-  echo "Both user.name and user.email are required." >&2
-  exit 2
-fi
-
-git -C "$root_dir" config user.name "$name"
-git -C "$root_dir" config user.email "$email"
-if [ -n "${github_user:-}" ]; then
-  git -C "$root_dir" config github.user "$github_user"
-  git -C "$root_dir" config credential.username "$github_user"
-fi
-
-if [ -n "${github_user:-}" ] && [ -n "${github_token:-}" ]; then
-  git -C "$root_dir" config credential.helper store
-
-  creds_file="$HOME/.git-credentials"
-  tmp_file="$(mktemp)"
-
-  if [ -f "$creds_file" ]; then
-    # Remove any existing GitHub entry; keep all other credentials.
-    grep -vE '^https://[^@]+@github\.com/?$' "$creds_file" > "$tmp_file" || true
+apply_profile_strict() {
+  local cred_user="$1"
+  if [ -z "$cred_user" ]; then
+    return 1
   fi
 
-  printf "https://%s:%s@github.com\n" "$github_user" "$github_token" >> "$tmp_file"
-  mv "$tmp_file" "$creds_file"
-  chmod 600 "$creds_file" || true
+  if ! has_profile_for_user "$cred_user"; then
+    exit 1
+  fi
+
+  local prof_name prof_email
+  prof_name=$(git config --global --get "$(profile_key_name "$cred_user")" 2>/dev/null || echo "")
+  prof_email=$(git config --global --get "$(profile_key_email "$cred_user")" 2>/dev/null || echo "")
+
+  git config --global user.name "$prof_name"
+  git config --global user.email "$prof_email"
+}
+
+apply_or_configure_profile_for_user() {
+  local cred_user="$1"
+  if [ -z "$cred_user" ]; then
+    return 0
+  fi
+
+  local prof_name_key prof_email_key
+  prof_name_key=$(profile_key_name "$cred_user")
+  prof_email_key=$(profile_key_email "$cred_user")
+
+  local prof_name prof_email
+  prof_name=$(git config --global --get "$prof_name_key" 2>/dev/null || echo "")
+  prof_email=$(git config --global --get "$prof_email_key" 2>/dev/null || echo "")
+
+  if [ -n "$prof_name" ] || [ -n "$prof_email" ]; then
+    if [ -n "$prof_name" ]; then
+      git config --global user.name "$prof_name"
+    fi
+    if [ -n "$prof_email" ]; then
+      git config --global user.email "$prof_email"
+    fi
+    echo "✓ Applied global profile for '$cred_user'"
+    return 0
+  fi
+
+  echo "(no saved global profile for '$cred_user'; leaving global user.name/user.email unchanged)"
+}
+
+configure_profile_for_user() {
+  local cred_user="$1"
+  if [ -z "$cred_user" ]; then
+    return 0
+  fi
+
+  local prof_name_key prof_email_key
+  prof_name_key=$(profile_key_name "$cred_user")
+  prof_email_key=$(profile_key_email "$cred_user")
+
+  local prof_name prof_email
+  read -p "Name: " prof_name
+  read -p "Email: " prof_email
+
+  if [ -z "$prof_name" ] || [ -z "$prof_email" ]; then
+    echo "Name and email are required to save a profile."
+    return 1
+  fi
+
+  if [ -n "$prof_name" ]; then
+    git config --global user.name "$prof_name"
+    git config --global "$prof_name_key" "$prof_name"
+  fi
+  if [ -n "$prof_email" ]; then
+    git config --global user.email "$prof_email"
+    git config --global "$prof_email_key" "$prof_email"
+  fi
+}
+
+
+
+CURRENT_CREDENTIAL_USER=$(git config --global credential.username 2>/dev/null || echo "")
+
+refresh_current_credential_user() {
+  CURRENT_CREDENTIAL_USER=$(git config --global credential.username 2>/dev/null || echo "")
+}
+
+# Auto-migrate all stored credential users to profiles if no profiles exist
+migrate_existing_user() {
+  local migrated_flag
+  migrated_flag=$(git config --global switch-user.migrated 2>/dev/null || echo "")
+  if [ "$PROFILE_COUNT" -eq 0 ] && [ -f ~/.git-credentials ] && [ "$migrated_flag" != "true" ]; then
+    local stored_users
+    stored_users=$(sed -n 's#^https://\([^:]*\):.*#\1#p' ~/.git-credentials 2>/dev/null | sort -u)
+    
+    if [ -n "$stored_users" ]; then
+      local current_name current_email
+      current_name=$(git config --global user.name 2>/dev/null || echo "")
+      current_email=$(git config --global user.email 2>/dev/null || echo "")
+      
+      # Create profile for current user if we have name/email
+      if [ -n "$CURRENT_CREDENTIAL_USER" ] && [ -n "$current_name" ] && [ -n "$current_email" ]; then
+        git config --global "switch-user.profile.${CURRENT_CREDENTIAL_USER}.name" "$current_name"
+        git config --global "switch-user.profile.${CURRENT_CREDENTIAL_USER}.email" "$current_email"
+      fi
+      
+      # Create placeholder profiles for other stored users
+      while IFS= read -r user; do
+        if [ "$user" != "$CURRENT_CREDENTIAL_USER" ] && [ -n "$user" ]; then
+          git config --global "switch-user.profile.${user}.name" "$user"
+          git config --global "switch-user.profile.${user}.email" "${user}@example.com"
+        fi
+      done <<< "$stored_users"
+      
+      # Refresh profile list
+      PROFILE_USERS=()
+      while IFS= read -r _p; do
+        if [ -n "${_p:-}" ]; then
+          PROFILE_USERS+=("$_p")
+        fi
+      done < <(get_profile_users)
+      PROFILE_COUNT=${#PROFILE_USERS[@]}
+      
+      # Set migration flag
+      git config --global switch-user.migrated "true"
+    fi
+  fi
+}
+
+PROFILE_USERS=()
+while IFS= read -r _p; do
+  if [ -n "${_p:-}" ]; then
+    PROFILE_USERS+=("$_p")
+  fi
+done < <(get_profile_users)
+
+PROFILE_COUNT=${#PROFILE_USERS[@]}
+
+migrate_existing_user
+
+# move current to top
+if [ -n "${CURRENT_CREDENTIAL_USER:-}" ] && [ "$PROFILE_COUNT" -gt 0 ]; then
+  reordered=()
+  for u in "${PROFILE_USERS[@]}"; do
+    if [ "$u" = "$CURRENT_CREDENTIAL_USER" ]; then
+      reordered=("$u" "${reordered[@]}")
+    else
+      reordered+=("$u")
+    fi
+  done
+  PROFILE_USERS=("${reordered[@]}")
 fi
 
-echo "Repo-local git identity set:"
-echo "  user.name:  $(git -C "$root_dir" config user.name)"
-echo "  user.email: $(git -C "$root_dir" config user.email)"
-if git -C "$root_dir" config github.user >/dev/null 2>&1; then
-  echo "  github.user: $(git -C "$root_dir" config github.user)"
+if [ "$PROFILE_COUNT" -eq 0 ]; then
+  echo "(none)"
+else
+  i=1
+  for u in "${PROFILE_USERS[@]}"; do
+    if [ -n "${CURRENT_CREDENTIAL_USER:-}" ] && [ "$u" = "$CURRENT_CREDENTIAL_USER" ]; then
+      echo "${i}) ${u} (current)"
+    else
+      echo "${i}) ${u}"
+    fi
+    i=$((i + 1))
+  done
 fi
-if git -C "$root_dir" config credential.username >/dev/null 2>&1; then
-  echo "  credential.username: $(git -C "$root_dir" config credential.username)"
-fi
-if git -C "$root_dir" config credential.helper >/dev/null 2>&1; then
-  echo "  credential.helper: $(git -C "$root_dir" config credential.helper)"
-fi
+
+echo ""
+echo "1) switch"
+echo "2) show"
+echo "3) add"
+echo "4) delete"
+echo "5) quit"
+
+read -p "Choose [1-5]: " action_choice
+
+case $action_choice in
+  1)
+    if [ "$PROFILE_COUNT" -eq 0 ]; then
+      exit 0
+    fi
+    read -p "User number [1-${PROFILE_COUNT}]: " pick
+    if [[ "$pick" =~ ^[0-9]+$ ]] && [ "$pick" -ge 1 ] && [ "$pick" -le "$PROFILE_COUNT" ]; then
+      selected_user="${PROFILE_USERS[$((pick - 1))]}"
+      git config --global credential.username "$selected_user"
+      refresh_current_credential_user
+      apply_profile_strict "$CURRENT_CREDENTIAL_USER"
+      echo "CURRENT USER IS: ${CURRENT_CREDENTIAL_USER}"
+    fi
+    ;;
+  2)
+    if [ "$PROFILE_COUNT" -eq 0 ]; then
+      echo "No users to show"
+    else
+      read -p "User number [1-${PROFILE_COUNT}]: " pick
+      if [[ "$pick" =~ ^[0-9]+$ ]] && [ "$pick" -ge 1 ] && [ "$pick" -le "$PROFILE_COUNT" ]; then
+        selected_user="${PROFILE_USERS[$((pick - 1))]}"
+        prof_name=$(git config --global --get "$(profile_key_name "$selected_user")" 2>/dev/null || echo '<not set>')
+        prof_email=$(git config --global --get "$(profile_key_email "$selected_user")" 2>/dev/null || echo '<not set>')
+        echo "User: ${selected_user}"
+        echo "Name: ${prof_name}"
+        echo "Email: ${prof_email}"
+      fi
+    fi
+    ;;
+  3)
+    read -p "GitHub username: " new_cred_user
+    if [ -z "$new_cred_user" ]; then
+      exit 1
+    fi
+    configure_profile_for_user "$new_cred_user" || exit 1
+    
+    # Store PAT in ~/.git-credentials
+    read -s -p "Enter GitHub Personal Access Token (PAT) for '$new_cred_user': " token
+    echo ""
+    if [ -n "$token" ]; then
+      touch ~/.git-credentials
+      chmod 600 ~/.git-credentials 2>/dev/null || true
+      tmp_file=$(mktemp)
+      grep -vF "https://$new_cred_user:" ~/.git-credentials >"$tmp_file" 2>/dev/null || true
+      printf '%s\n' "https://$new_cred_user:$token@github.com" >>"$tmp_file"
+      mv "$tmp_file" ~/.git-credentials
+    fi
+    
+    git config --global credential.username "$new_cred_user"
+    refresh_current_credential_user
+    apply_profile_strict "$CURRENT_CREDENTIAL_USER"
+    echo "CURRENT USER IS: ${CURRENT_CREDENTIAL_USER}"
+    ;;
+  4)
+    if [ "$PROFILE_COUNT" -eq 0 ]; then
+      exit 0
+    fi
+    read -p "User number [1-${PROFILE_COUNT}]: " pick
+    if [[ "$pick" =~ ^[0-9]+$ ]] && [ "$pick" -ge 1 ] && [ "$pick" -le "$PROFILE_COUNT" ]; then
+      selected_user="${PROFILE_USERS[$((pick - 1))]}"
+      git config --global --unset "$(profile_key_name "$selected_user")" 2>/dev/null || true
+      git config --global --unset "$(profile_key_email "$selected_user")" 2>/dev/null || true
+      if [ "${CURRENT_CREDENTIAL_USER:-}" = "$selected_user" ]; then
+        git config --global --unset credential.username 2>/dev/null || true
+      fi
+      
+      # Remove from ~/.git-credentials
+      if [ -f ~/.git-credentials ]; then
+        tmp_file=$(mktemp)
+        grep -vF "https://$selected_user:" ~/.git-credentials >"$tmp_file" 2>/dev/null || true
+        mv "$tmp_file" ~/.git-credentials
+        if [ ! -s ~/.git-credentials ]; then
+          rm -f ~/.git-credentials
+        fi
+      fi
+    fi
+    ;;
+  5)
+    exit 0
+    ;;
+  *)
+    exit 1
+    ;;
+esac
+
