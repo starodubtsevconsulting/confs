@@ -12,8 +12,8 @@
 3. update `.ai/*.md` if needed
    - rule: if you change `dev-workflow.md`, consider updating the relevant `*.command.md`.
    - rule: if you add/update a `*.command.md`, consider adding/updating a backend helper `.ai/scripts/*.command.sh` to automate it.
-4. before committing/pushing, switch/check repo-local git user (do NOT use `--global`) (see `.ai/commit.command.md` for identity setup):
-   - `./git/switch-user.sh`
+4. before committing/pushing, switch/check git user identity (see `.ai/commit.command.md` for identity setup):
+   - `./git/switch-user.sh` - manages global Git profiles with switch/show/add/delete operations
 5. git commit every logical step immediately (do not wait / do not batch unrelated work) with a descriptive message (see `.ai/commit.command.md` for details)
 6. git push (see `.ai/push.command.md` for details)
 7. create PR (use data from plan.md for the final descriptive comment what was done in PR, see `.ai/pr.command.md` for details)
