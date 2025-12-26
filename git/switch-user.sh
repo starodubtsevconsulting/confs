@@ -273,17 +273,22 @@ case $action_choice in
     if [ -z "$new_cred_user" ]; then
       exit 1
     fi
+    
+    # Ask for GitHub host (support enterprise GitHub)
+    read -p "GitHub host [github.com]: " github_host
+    github_host=${github_host:-github.com}
+    
     configure_profile_for_user "$new_cred_user" || exit 1
     
     # Store PAT in ~/.git-credentials
-    read -s -p "Enter GitHub Personal Access Token (PAT) for '$new_cred_user': " token
+    read -s -p "Enter GitHub Personal Access Token (PAT) for '$new_cred_user' on '$github_host': " token
     echo ""
     if [ -n "$token" ]; then
       touch ~/.git-credentials
       chmod 600 ~/.git-credentials 2>/dev/null || true
       tmp_file=$(mktemp)
       grep -vF "https://$new_cred_user:" ~/.git-credentials >"$tmp_file" 2>/dev/null || true
-      printf '%s\n' "https://$new_cred_user:$token@github.com" >>"$tmp_file"
+      printf '%s\n' "https://$new_cred_user:$token@$github_host" >>"$tmp_file"
       mv "$tmp_file" ~/.git-credentials
     fi
     
@@ -305,7 +310,7 @@ case $action_choice in
         git config --global --unset credential.username 2>/dev/null || true
       fi
       
-      # Remove from ~/.git-credentials
+      # Remove from ~/.git-credentials (all hosts for this user)
       if [ -f ~/.git-credentials ]; then
         tmp_file=$(mktemp)
         grep -vF "https://$selected_user:" ~/.git-credentials >"$tmp_file" 2>/dev/null || true
