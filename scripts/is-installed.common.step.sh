@@ -31,6 +31,9 @@ case "$module_name" in
   java)
     bash "$checker" --path "$HOME/java/current/bin/java"
     ;;
+  maven)
+    bash "$checker" --path "$HOME/maven/current/bin/mvn"
+    ;;
   nodejs)
     bash "$checker" --path "$HOME/node/current/bin/node"
     ;;

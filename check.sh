@@ -5,6 +5,7 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck disable=SC1091
 source "$script_dir/scripts/report-log.sh"
 report_log_init "check.sh" "$script_dir"
+matrix_file="$script_dir/v_matrix.json"
 
 missing_count=0
 
@@ -225,12 +226,56 @@ else
 fi
 
 echo
+echo "Maven"
+maven_home="$HOME/maven"
+mvn_current="${maven_home}/current/bin/mvn"
+expected_maven_version="3.9.9"
+if [ -f "$matrix_file" ] && command -v python3 >/dev/null 2>&1; then
+  expected_from_matrix="$(python3 - "$matrix_file" <<'PY'
+import json, sys
+path = sys.argv[1]
+with open(path, "r", encoding="utf-8") as fh:
+    data = json.load(fh)
+ver = data.get("default_maven_version")
+if ver:
+    print(ver)
+PY
+)"
+  expected_from_matrix="${expected_from_matrix//$'\r'/}"
+  if [ -n "$expected_from_matrix" ]; then
+    expected_maven_version="$expected_from_matrix"
+  fi
+fi
+
+if [ -x "$mvn_current" ]; then
+  maven_version="$( (set +o pipefail; "$mvn_current" -v 2>/dev/null | head -n1 | awk '{print $3}') || true)"
+  print_item "mvn" "OK" "${maven_version:-unknown}"
+else
+  if has_cmd mvn; then
+    print_item "mvn" "SYSTEM"
+  else
+    print_item "mvn" "MISSING"
+  fi
+fi
+
+if [ -d "${maven_home}/${expected_maven_version}" ]; then
+  print_item "maven ${expected_maven_version} dir" "OK"
+else
+  print_item "maven ${expected_maven_version} dir" "MISSING"
+fi
+
+if [ -x "${maven_home}/switch.sh" ]; then
+  print_item "maven switch.sh" "OK"
+else
+  print_item "maven switch.sh" "MISSING"
+fi
+
+echo
 echo "Scala"
 scala_home="$HOME/scala"
 scala_current="${scala_home}/current/bin/scala"
 default_scala_version="3.4.1"
 expected_scala_version="$default_scala_version"
-matrix_file="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/v_matrix.json"
 if [ -f "$matrix_file" ] && command -v python3 >/dev/null 2>&1; then
   codename="$(. /etc/os-release && echo "$VERSION_CODENAME")"
   expected_from_matrix="$(python3 - "$matrix_file" "$codename" <<'PY'

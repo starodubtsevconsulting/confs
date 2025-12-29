@@ -74,7 +74,7 @@ apply_profile_strict() {
   fi
 
   if ! has_profile_for_user "$cred_user"; then
-    exit 1
+    return 1
   fi
 
   local prof_name prof_email
@@ -83,6 +83,7 @@ apply_profile_strict() {
 
   git config --global user.name "$prof_name"
   git config --global user.email "$prof_email"
+  return 0
 }
 
 apply_or_configure_profile_for_user() {
@@ -249,8 +250,11 @@ case $action_choice in
       selected_user="${PROFILE_USERS[$((pick - 1))]}"
       git config --global credential.username "$selected_user"
       refresh_current_credential_user
-      apply_profile_strict "$CURRENT_CREDENTIAL_USER"
-      echo "CURRENT USER IS: ${CURRENT_CREDENTIAL_USER}"
+      if apply_profile_strict "$CURRENT_CREDENTIAL_USER"; then
+        echo "CURRENT USER IS: ${CURRENT_CREDENTIAL_USER}"
+      else
+        echo "Profile for '${CURRENT_CREDENTIAL_USER}' is missing name/email. Use option 3 to add/update before switching."
+      fi
     fi
     ;;
   2)
@@ -265,6 +269,16 @@ case $action_choice in
         echo "User: ${selected_user}"
         echo "Name: ${prof_name}"
         echo "Email: ${prof_email}"
+        read -p "Switch to this user? [y/N]: " confirm_switch
+        if [[ "$confirm_switch" =~ ^[Yy]$ ]]; then
+          git config --global credential.username "$selected_user"
+          refresh_current_credential_user
+          if apply_profile_strict "$CURRENT_CREDENTIAL_USER"; then
+            echo "CURRENT USER IS: ${CURRENT_CREDENTIAL_USER}"
+          else
+            echo "Profile for '${CURRENT_CREDENTIAL_USER}' is missing name/email. Use option 3 to add/update before switching."
+          fi
+        fi
       fi
     fi
     ;;
@@ -294,8 +308,11 @@ case $action_choice in
     
     git config --global credential.username "$new_cred_user"
     refresh_current_credential_user
-    apply_profile_strict "$CURRENT_CREDENTIAL_USER"
-    echo "CURRENT USER IS: ${CURRENT_CREDENTIAL_USER}"
+    if apply_profile_strict "$CURRENT_CREDENTIAL_USER"; then
+      echo "CURRENT USER IS: ${CURRENT_CREDENTIAL_USER}"
+    else
+      echo "Profile for '${CURRENT_CREDENTIAL_USER}' is missing name/email. Use option 3 to add/update before switching."
+    fi
     ;;
   4)
     if [ "$PROFILE_COUNT" -eq 0 ]; then
@@ -328,4 +345,3 @@ case $action_choice in
     exit 1
     ;;
 esac
-

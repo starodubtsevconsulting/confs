@@ -91,5 +91,10 @@
   "java_notes": [
     "Java uses AWS Corretto tarballs for the selected major.",
     "latest is installed when install_latest_java=true."
+  ],
+  "default_maven_version": "3.9.9",
+  "maven_notes": [
+    "Maven uses official Apache Maven binary tarballs installed into ~/maven.",
+    "Override with MAVEN_VERSION_OVERRIDE when running maven/setup.sh."
   ]
 }
