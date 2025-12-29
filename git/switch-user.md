@@ -170,7 +170,7 @@ Choose [1-5]: 2
 User number [1-2]: 1
 User: sstarodubtsev
 Name: Sergii Starodubtsev (sxm)
-Email: Sergii.Starodubtsev@Siriusxm.com
+Email: user@domain.com
 ```
 
 ## Security Notes
