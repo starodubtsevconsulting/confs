@@ -22,7 +22,7 @@
     "This is a simple recommendation matrix.",
     "Project installs Python 3.12 from source into ~/python regardless of system Python."
   ],
-  "default_node_major": "22",
+  "default_node_major": "20",
   "ubuntu_to_node": [
     {
       "ubuntu": "20.04",
@@ -32,12 +32,12 @@
     {
       "ubuntu": "22.04",
       "codename": "jammy",
-      "recommended_major": "22"
+      "recommended_major": "20"
     },
     {
       "ubuntu": "24.04",
       "codename": "noble",
-      "recommended_major": "22",
+      "recommended_major": "20",
       "selected": true
     }
   ],
