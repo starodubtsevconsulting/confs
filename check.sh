@@ -123,6 +123,19 @@ else
 fi
 
 echo
+echo "IDE"
+if has_cmd code; then
+  print_item "VS Code" "OK"
+else
+  vscode_home="$HOME/vscode"
+  if [ -x "${vscode_home}/bin/code" ] || [ -x "${vscode_home}/code" ]; then
+    print_item "VS Code" "OK" "home"
+  else
+    print_item "VS Code" "MISSING"
+  fi
+fi
+
+echo
 echo "Docker"
 if has_cmd docker; then
   print_item "docker" "OK"
