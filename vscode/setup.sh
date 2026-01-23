@@ -104,6 +104,26 @@ else
   echo "VS Code installed, but 'code' launcher not found." >&2
 fi
 
+# Install default extensions (best effort)
+extensions_file="$script_dir/extensions.txt"
+code_bin="$vscode_home/bin/code"
+if [ ! -x "$code_bin" ]; then
+  code_bin="$vscode_home/code"
+fi
+if [ -x "$code_bin" ] && [ -f "$extensions_file" ]; then
+  if [ -d "$HOME/.vscode/extensions" ]; then
+    rm -rf "$HOME/.vscode/extensions"
+  fi
+  if [ -d "$HOME/.config/Code" ]; then
+    rm -rf "$HOME/.config/Code"
+  fi
+  while IFS= read -r ext; do
+    ext="$(printf "%s" "$ext" | sed -E 's/#.*$//g' | xargs)"
+    [ -z "$ext" ] && continue
+    "$code_bin" --install-extension "$ext" --force || true
+  done < "$extensions_file"
+fi
+
 # Fix SUID sandbox permissions (required on Linux)
 if [ -f "$vscode_home/chrome-sandbox" ]; then
   sudo chown root:root "$vscode_home/chrome-sandbox"

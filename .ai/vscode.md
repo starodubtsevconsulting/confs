@@ -16,6 +16,7 @@ Install layout:
 Behavior:
 - If a system-wide VS Code is detected (apt or snap), the script asks to remove it first.
 - Fixes `chrome-sandbox` permissions via sudo (required on Linux).
+- Installs default extensions from `vscode/extensions.txt`.
 - Prints the module README at the end.
 
 Usage:
