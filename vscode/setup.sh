@@ -110,6 +110,33 @@ if [ -f "$vscode_home/chrome-sandbox" ]; then
   sudo chmod 4755 "$vscode_home/chrome-sandbox"
 fi
 
+# Create desktop entry
+desktop_dir="$HOME/.local/share/applications"
+mkdir -p "$desktop_dir"
+icon_path="$vscode_home/resources/app/resources/linux/code.png"
+exec_path="$vscode_home/bin/code"
+if [ ! -x "$exec_path" ]; then
+  exec_path="$vscode_home/code"
+fi
+
+cat <<EOF > "$desktop_dir/code.desktop"
+[Desktop Entry]
+Name=Visual Studio Code
+Comment=Code Editing. Redefined.
+Exec=$exec_path
+Icon=$icon_path
+Type=Application
+Categories=Development;IDE;
+Terminal=false
+StartupWMClass=Code
+EOF
+
+# Optional Desktop shortcut
+desktop_link_dir="$HOME/Desktop"
+if [ -d "$desktop_link_dir" ]; then
+  ln -sfn "$desktop_dir/code.desktop" "$desktop_link_dir/Visual Studio Code.desktop"
+fi
+
 if ! grep -q "# LOCAL_BIN_START" "$HOME/.profile" 2>/dev/null; then
   {
     echo ""
