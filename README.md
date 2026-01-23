@@ -92,6 +92,13 @@ and make day-to-day maintenance cheap.
 This, along with the folder structure and READMEs, should be enough context
 for your AI companion to be helpful.
 
+## Commands model
+
+Each top-level folder is treated as a command (concept). The default command is
+the folder’s `setup.sh`. The `.ai/` folder documents each command with a
+matching markdown file (for example, `.ai/vscode.md`) so automation can follow
+the same installation rules as humans.
+
 Another reason this project exists is to support my work on other projects.
 Whenever I work on a different project, I reference this `confs` repo in the
 `.ai/` markdown files for common dev workflow commands (commit, push, PR, merge).

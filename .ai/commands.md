@@ -23,6 +23,7 @@ node-switch
 ./git/setup.sh
 ./vim/setup.sh
 ./docker/setup.sh
+./vscode/setup.sh
 ./python/setup.sh
 ./java/setup.sh
 ./scala/setup.sh
