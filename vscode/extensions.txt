@@ -2,3 +2,4 @@
 # Installed to: ~/.vscode/extensions
 OpenAI.chatgpt
 vscjava.vscode-java-pack
+ms-vscode-remote.remote-containers

@@ -135,6 +135,16 @@ else
   fi
 fi
 
+if has_cmd zed; then
+  print_item "Zed" "OK"
+else
+  if [ -x "$HOME/.local/bin/zed" ]; then
+    print_item "Zed" "OK" "home"
+  else
+    print_item "Zed" "MISSING"
+  fi
+fi
+
 echo
 echo "Docker"
 if has_cmd docker; then
